@@ -1,4 +1,4 @@
-"""
+"""JSON Lightweight Schema.
 """
 
 import sys
@@ -13,7 +13,7 @@ def unpack(key):
     return data_type, regex, repeat
 
 def valid_key(key, data_type, regex):
-    """Verify key is of data_type nad matches regex."""
+    """Verify key is of data_type and matches regex."""
     return isinstance(key, data_type) and re.findall(regex, key)
 
 def valid_length(repeat, keys):
