@@ -14,7 +14,7 @@ def unpack(key):
 
 def valid_key(key, data_type, regex):
     """Verify key is of data_type and matches regex."""
-    return isinstance(key, data_type) and re.findall(regex, key)
+    return isinstance(key, data_type) and re.findall(regex, key) != []
 
 def valid_length(repeat, keys):
     """Check for valid combo of repeat and length of keys."""
