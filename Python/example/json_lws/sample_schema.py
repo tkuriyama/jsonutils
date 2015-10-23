@@ -14,7 +14,8 @@ def ret_schema():
                 ('stock price', str, 'price'): ('price', float),
                 ('company name', str): ('name', str)
             }
-        }
+        },
+        ('magic number', int, 'magic_number'): ('number', int, 42)
     }
 
     return schema
