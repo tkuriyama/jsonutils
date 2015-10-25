@@ -116,7 +116,10 @@ def valid_length(repeat, keys):
             False)
 
 def find_data_keys(data, schema_key):
-    """
+    """Return all keys in data that match the schema key definition.
+    Args
+        data: dict of data
+        schema_key: tuple of schema key definition
     """
     dtype, regex, repeat = parse_schema_key(schema_key)
     found_keys = [data_key for data_key in data
@@ -163,41 +166,51 @@ def gen_log(log, errors):
     ret += '\n'.join(log)
     return ret
 
+def update_stack(s_path, d_path, schema, new_s_key, new_d_key):
+    """"""
+    new_s_path = s_path + [new_s_key]
+    new_d_path = d_path + [new_d_key]
+    schema_keys = walk(schema, new_s_path).keys()
+    return [(new_s_path, s_key, new_d_path) for s_key in schema_keys]
+
 def validate_schema(schema, data):
     """Schema-centric validation.
     """
 
-    key_stack = [(['root'], ['root'])]
     log = ['root']
     errors = {'key': 0, 'value': 0}
 
-    while key_stack:
-        schema_path, data_path = key_stack.pop()
-        schema_sub = walk(schema, schema_path)
-        data_sub = walk(data, data_path)
+    stack = update_stack([], [], schema, 'root', 'root')
+    while stack:
+        print '\nCURRENT STACK', stack
+        print '\nCURRENT OUTPUT', '\n'.join(log)
+        print '\n'
+        s_path, s_key, d_path = stack.pop()
+        schema_sub = walk(schema, s_path)
+        data_sub = walk(data, d_path)
 
-        for s_key, s_val in schema_sub.items():
-            d_keys = find_data_keys(data_sub, s_key)
-            if not d_keys:
-                log.append(log_path(schema_path, s_key[0], True))
-                errors['key'] += 1
-                print 'error', s_key
+        # error case: schema key not found in data
+        d_keys = find_data_keys(data_sub, s_key)
+        if not d_keys:
+            log.append(log_path(s_path, s_key[0], True))
+            errors['key'] += 1
+            print 'error', s_key
+            continue
 
-            for d_key in d_keys:
-                d_val = data_sub[d_key]
-                # not end of branch, add path to stack
-                if isinstance(s_val, dict):
-                    paths = (schema_path + [s_key], data_path + [d_key])
-                    key_stack.append(paths)
-                    log.append(log_path(schema_path, s_key[0]))
-                    print 'dict', s_key, d_key
-                # end of branch, check data value against schema
-                else:
-                    if valid_data_val(s_val, d_val):
-                        log.append(log_value(schema_path, s_val[0]))
-                    else:
-                        log.append(log_value(schema_path, s_val[0], d_val))
-                    print 'not dict', s_key, d_key
+        print '\nEntering d_keys loop', d_keys
+        s_val = schema_sub[s_key]
+        for d_key in d_keys:
+            d_val = data_sub[d_key]
+            # not end of branch, add path to stack
+            if isinstance(s_val, dict):
+                stack.extend(update_stack(s_path, d_path, schema, s_key, d_key))
+                log.append(log_path(s_path, s_key[0]))
+                print 'dict', s_key, d_key
+            # end of branch, check data value against schema
+            else:
+                node = '' if valid_data_val(s_val, d_val) else d_val
+                log.append(log_value(s_path, s_val[0], node))
+                print 'not dict', s_key, d_key
 
     return gen_log(log, errors)
 
