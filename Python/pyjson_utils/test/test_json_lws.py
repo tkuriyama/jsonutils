@@ -19,7 +19,15 @@ class TestValidateValues:
         assert json_lws.valid_text(u'string', r'[0-9]*') is False
         assert json_lws.valid_text(u'', r'.*') is False
 
+class TestTypeHelpers:
+    """"""
 
+    def test_classify(self):
+        assert json_lws.classify(str) == 'text'
+        assert json_lws.classify(unicode) == 'text'
+        assert json_lws.classify(int) == 'num'
+        assert json_lws.classify(float) == 'num'
+        assert json_lws.classify('test') is False
 
 class TestValidateKeys:
     """Test functions that validate keys."""
