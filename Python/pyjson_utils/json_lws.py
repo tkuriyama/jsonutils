@@ -6,7 +6,7 @@ import re
 import json
 import pickle
 
-TAB = '    '
+TAB = ' ' * 4
 
 # Type Validation Helpers
 
@@ -16,19 +16,19 @@ def valid_text(val, regex):
     return False if not match else match[0] == val
 
 def valid_num(val, rule):
-    """"""
+    """Default True, check against rule if provided."""
     return val == rule if rule else True
 
 def valid_list(val, rule):
-    """"""
+    """Default True, check against rule if provided."""
     return val == rule if rule else True
 
 def valid_bool(val, rule):
-    """"""
+    """Default True, check against rule if provided."""
     return val is rule if rule != '' else True
 
 def valid_null(val, rule):
-    """"""
+    """Always True."""
     return True
 
 def is_text(val):
@@ -62,7 +62,7 @@ def classify_val(val):
 # Validate Values
 
 def parse_schema_val(val):
-    """"""
+    """Unpack tuple of the schema value."""
     _, dtype = val[:2]
     if len(val) == 3:
         match = val[2]
@@ -71,12 +71,14 @@ def parse_schema_val(val):
     return dtype, match
 
 def match_types(schema_type, data_val):
-    """"""
+    """Return True if data types match between schema and data value.
+    The difference between string and unicode is ignored.
+    """
     if classify(schema_type) == 'text' and is_text(data_val): return True
     return isinstance(data_val, schema_type)
 
 def match_vals(schema_rule, data_val):
-    """"""
+    """Call type-specific function to verify data value matches schema rule."""
     dtype = classify_val(data_val)
     return (valid_text(data_val, schema_rule) if dtype is 'text' else
             valid_num(data_val, schema_rule) if dtype is 'num' else
@@ -86,7 +88,7 @@ def match_vals(schema_rule, data_val):
             False)
 
 def valid_data_val(schema_val, data_val):
-    """"""
+    """Verify data value validates against schema."""
     schema_type, schema_rule = parse_schema_val(schema_val)
     type_match = match_types(schema_type, data_val)
     val_match = match_vals(schema_rule, data_val)
@@ -95,14 +97,14 @@ def valid_data_val(schema_val, data_val):
 # Validate Keys
 
 def parse_schema_key(key):
-    """Unpack tuple of length 3 or optionally length 4, ignore first elem."""
+    """Unpack tuple of schema key."""
     _, dtype = key[:2]
     regex = '.*' if len(key) <= 2 else key[2]
     repeat = '' if len(key) <= 3 else key[3]
     return dtype, regex, repeat
 
 def valid_data_key(data_key, dtype, pattern):
-    """Verify key is of dtype and matches regex."""
+    """Verify key is text (string or unicode) and matches regex."""
     return (valid_text(data_key, pattern) if classify(dtype) == 'text' else
             False)
 
@@ -162,7 +164,7 @@ def gen_log(log, errors):
     return ret
 
 def validate_schema(schema, data):
-    """
+    """Schema-centric validation.
     """
 
     key_stack = [(['root'], ['root'])]
@@ -211,15 +213,19 @@ def join_logs(schema_log, data_log):
     return ('\n>>> SCHEMA VALIDATION\n' + schema_log + '\n'
             '\n>>> DATA VALIDATION\n' + data_log + '\n')
 
-def main(schema_fname, data_fname):
-    """
+def main(schema_path, data_path):
+    """Main.
+    Print and return string of validation results.
+    Args
+        schema_path: string of path to schema file
+        data_path: string of path to data file
     """
 
-    with open(schema_fname, 'r') as f:
+    with open(schema_path, 'r') as f:
         raw = pickle.load(f)
         schema = {'root': raw}
 
-    with open(data_fname, 'r') as f:
+    with open(data_path, 'r') as f:
         raw = json.load(f)
         data = {'root': raw}
 
