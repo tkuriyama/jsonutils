@@ -1,50 +1,63 @@
 (dp0
-(S'dict of stocks'
+(S'path to directory'
 p1
 c__builtin__
 str
 p2
-S'stocks'
+S'path'
 p3
 tp4
-(dp5
-(S'tickers'
-p6
-g2
-S'[A-Z].*'
-p7
-S'+'
-p8
-tp9
-(dp10
-(S'company name'
-p11
-g2
-tp12
-(S'name'
-p13
-g2
-tp14
-s(S'stock price'
-p15
-g2
-S'price'
-p16
-tp17
-(g16
-c__builtin__
-float
-p18
-tp19
-sss(S'path to directory'
-p20
-g2
-S'path'
-p21
-tp22
-(g21
+(g3
 g2
 S'/apps/homefs1/.*'
+p5
+tp6
+s(S'magic number'
+p7
+g2
+S'magic_number'
+p8
+tp9
+(S'number'
+p10
+c__builtin__
+int
+p11
+I42
+tp12
+s(S'dict of stocks'
+p13
+g2
+S'stocks'
+p14
+tp15
+(dp16
+(S'ticker'
+p17
+g2
+S'[A-Z]*'
+p18
+S'+'
+p19
+tp20
+(dp21
+(S'stock price'
+p22
+g2
+S'price'
 p23
 tp24
-s.
+(g23
+c__builtin__
+float
+p25
+tp26
+s(S'company name'
+p27
+g2
+tp28
+(S'name'
+p29
+g2
+tp30
+sss.

@@ -10,12 +10,12 @@ def ret_schema():
     schema = {
         ('path to directory', str, 'path'): ('path', str, '/apps/homefs1/.*'),
         ('dict of stocks', str, 'stocks'): {
-            ('tickers', str, '[A-Z].*', '+'): {
+            ('ticker', str, '[A-Z]*', '+'): {
                 ('stock price', str, 'price'): ('price', float),
                 ('company name', str): ('name', str)
             }
         },
-        ('magic number', int, 'magic_number'): ('number', int, 42)
+        ('magic number', str, 'magic_number'): ('number', int, 42)
     }
 
     return schema
