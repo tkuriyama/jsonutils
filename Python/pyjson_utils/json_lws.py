@@ -5,8 +5,11 @@ import sys
 import re
 import json
 import pickle
+from collections import defaultdict
 
 TAB = ' ' * 4
+ERR_KEY = '*** Key error.'
+ERR_VAL = '*** Value error.'
 
 # Type Validation Helpers
 
@@ -127,92 +130,72 @@ def find_data_keys(data, schema_key):
 
     return found_keys if valid_length(repeat, found_keys) else []
 
-# Main Validation
+# Schema Validation
+
+def gen_output(log):
+    """
+
+    """
+
+    return ''
 
 def walk(d, path):
     """Walk dict d using path as sequential list of keys, return last value."""
     if not path: return d
     return walk(d[path[0]], path[1:])
 
-def log_path(path, schema_key, error=False):
-    """Return string, logger function for paths."""
-    offset = len(path) * TAB
-    error_str = TAB + '*** Key not found.' if error else ''
-    return offset + '|-- ' + schema_key + error_str
-
-def log_value(path, schema_val, data_val=''):
-    """Return string, logger function for values."""
-    SHOW = 10
-    offset = len(path) * TAB
-    if data_val:
-        val = str(data_val)
-        error_val = val if len(val) < SHOW else val[:SHOW] + '...'
-    else:
-        error_val = ''
-    error_str = TAB + '*** Unexpected value: ' + error_val if error_val else ''
-    return offset + '|-- ' + schema_val + error_str
-
-def gen_log(log, errors):
-    """Combine log components into single string.
+def update_stack(s_path, d_path, schema, s_key, d_key):
+    """Update validation stack.
+    Accepts schema and data path so far and returns next possible schema keys.
     Args
-        title: string
-        log: list of strings
-        errors: dict of {string: int} pairs
+        s_path: list of schema keys walked thus far
+        d_path: list of data keys walked thus far
+        schema: dict of schema
+        s_key: string of next schema key
+        d_key: string of next data key
+    Returns
+        List of tuples, one tuple per next schema key:
+        (updated s_path, string of next schema key, updated d_path).
     """
-    ret = '\n> Errors\n\n'
-    for key in sorted(errors):
-        ret += TAB + key + ': ' + str(errors[key]) + '\n'
-    ret += '\n> Tree\n\n'
-    ret += '\n'.join(log)
-    return ret
-
-def update_stack(s_path, d_path, schema, new_s_key, new_d_key):
-    """"""
-    new_s_path = s_path + [new_s_key]
-    new_d_path = d_path + [new_d_key]
+    new_s_path = s_path + [s_key]
+    new_d_path = d_path + [d_key]
     schema_keys = walk(schema, new_s_path).keys()
-    return [(new_s_path, s_key, new_d_path) for s_key in schema_keys]
+    return [(new_s_path, new_s_key, new_d_path) for new_s_key in schema_keys]
 
 def validate_schema(schema, data):
     """Schema-centric validation.
     """
 
-    log = ['root']
-    errors = {'key': 0, 'value': 0}
+    log = defaultdict(list)
 
-    stack = update_stack([], [], schema, 'root', 'root')
+    stack = update_stack([], [], schema, ('root', str), 'root')
     while stack:
-        print '\nCURRENT STACK', stack
-        print '\nCURRENT OUTPUT', '\n'.join(log)
-        print '\n'
         s_path, s_key, d_path = stack.pop()
+        prev_s, prev_d = s_path[-1][0], d_path[-1]
         schema_sub = walk(schema, s_path)
         data_sub = walk(data, d_path)
 
         # error case: schema key not found in data
         d_keys = find_data_keys(data_sub, s_key)
         if not d_keys:
-            log.append(log_path(s_path, s_key[0], True))
-            errors['key'] += 1
-            print 'error', s_key
+            log[(prev_s, prev_d)].append((s_key[0], ERR_KEY))
             continue
 
-        print '\nEntering d_keys loop', d_keys
         s_val = schema_sub[s_key]
         for d_key in d_keys:
             d_val = data_sub[d_key]
             # not end of branch, add path to stack
             if isinstance(s_val, dict):
                 stack.extend(update_stack(s_path, d_path, schema, s_key, d_key))
-                log.append(log_path(s_path, s_key[0]))
-                print 'dict', s_key, d_key
+                log[(prev_s, prev_d)].append((s_key[0], d_key))
             # end of branch, check data value against schema
             else:
-                node = '' if valid_data_val(s_val, d_val) else d_val
-                log.append(log_value(s_path, s_val[0], node))
-                print 'not dict', s_key, d_key
+                node = d_val if valid_data_val(s_val, d_val) else ERR_VAL
+                log[(prev_s, prev_d)].append((s_key[0], node))
 
-    return gen_log(log, errors)
+    return log, gen_output(log)
+
+# Data Validation
 
 def validate_data(schema, data):
     """
@@ -236,13 +219,13 @@ def main(schema_path, data_path):
 
     with open(schema_path, 'r') as f:
         raw = pickle.load(f)
-        schema = {'root': raw}
+        schema = {('root', str): raw}
 
     with open(data_path, 'r') as f:
         raw = json.load(f)
         data = {'root': raw}
 
-    schema_log = validate_schema(schema, data)
+    _, schema_log = validate_schema(schema, data)
     data_log = validate_data(schema, data)
     log = join_logs(schema_log, data_log)
 
