@@ -13,18 +13,27 @@ ERR_VAL = '*** Value error.'
 
 # Type Validation Helpers
 
-def valid_text(val, regex):
-    """Return True if regex fully matches string of value."""
-    match = re.findall(regex, val)
-    return False if not match else match[0] == val
+def valid_text(val, rule):
+    """Return True if regex fully matches non-empty string of value."""
+    if callable(rule):
+        match = rule(val)
+    else:
+        match = re.findall(rule, val)
+    return (False if not match or not val else
+            True if match is True else
+            match[0] == val)
 
 def valid_num(val, rule):
     """Default True, check against rule if provided."""
-    return val == rule if rule else True
+    return (rule(val) if callable(rule) else
+            val == rule if rule else
+            True)
 
 def valid_list(val, rule):
     """Default True, check against rule if provided."""
-    return val == rule if rule else True
+    return (rule(val) if callable(rule) else
+            val == rule if rule else
+            True)
 
 def valid_bool(val, rule):
     """Default True, check against rule if provided."""
@@ -43,22 +52,24 @@ def is_num(val):
     return isinstance(val, int) or isinstance(val, float)
 
 def classify(dtype):
-    """Take data type and classify into string of JSON data type."""
+    """Take data type and classify into string of JSON data type.
+    Boolean check should occur before int since bool is subclass of int.
+    """
     return ('text' if dtype in (str, unicode) else
+            'bool' if dtype is bool else
             'num' if dtype in (int, float) else
             'dict' if dtype is dict else
             'list' if dtype is list else
-            'bool' if dtype is bool else
             'null' if dtype is None else
             False)
 
 def classify_val(val):
     """Take value and classify into string of JSON data type."""
     return ('text' if is_text(val) else
+            'bool' if isinstance(val, bool) else
             'num' if is_num(val) else
             'dict' if isinstance(val, dict) else
             'list' if isinstance(val, list) else
-            'bool' if isinstance(val, bool) else
             'null' if val is None else
             False)
 
@@ -68,10 +79,10 @@ def parse_schema_val(val):
     """Unpack tuple of the schema value."""
     _, dtype = val[:2]
     if len(val) == 3:
-        match = val[2]
+        rule = val[2]
     else:
-        match = '.*' if classify(dtype) == 'text' else ''
-    return dtype, match
+        rule = '.*' if classify(dtype) == 'text' else ''
+    return dtype, rule
 
 def match_types(schema_type, data_val):
     """Return True if data types match between schema and data value.
@@ -102,13 +113,13 @@ def valid_data_val(schema_val, data_val):
 def parse_schema_key(key):
     """Unpack tuple of schema key."""
     _, dtype = key[:2]
-    regex = '.*' if len(key) <= 2 else key[2]
+    rule = '.*' if len(key) <= 2 else key[2]
     repeat = '' if len(key) <= 3 else key[3]
-    return dtype, regex, repeat
+    return dtype, rule, repeat
 
-def valid_data_key(data_key, dtype, pattern):
+def valid_data_key(data_key, dtype, rule):
     """Verify key is text (string or unicode) and matches regex."""
-    return (valid_text(data_key, pattern) if classify(dtype) == 'text' else
+    return (valid_text(data_key, rule) if classify(dtype) == 'text' else
             False)
 
 def valid_length(repeat, keys):
@@ -124,9 +135,9 @@ def find_data_keys(data, schema_key):
         data: dict of data
         schema_key: tuple of schema key definition
     """
-    dtype, regex, repeat = parse_schema_key(schema_key)
+    dtype, rule, repeat = parse_schema_key(schema_key)
     found_keys = [data_key for data_key in data
-                  if valid_data_key(data_key, dtype, regex)]
+                  if valid_data_key(data_key, dtype, rule)]
 
     return found_keys if valid_length(repeat, found_keys) else []
 
