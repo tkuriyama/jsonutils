@@ -1,1 +1,1 @@
-__all__ = ['json_lws']
+__all__ = ['json_lws', 'logger']
