@@ -6,10 +6,10 @@ import re
 import json
 import pickle
 from collections import defaultdict
+import logger
 
-TAB = ' ' * 4
-ERR_KEY = '*** Key error.'
-ERR_VAL = '*** Value error.'
+ERR_KEY = hash('KEY ERROR')
+ERR_VAL = hash('VAL ERROR')
 
 # Type Validation Helpers
 
@@ -144,11 +144,10 @@ def find_data_keys(data, schema_key):
 # Schema Validation
 
 def gen_output(log):
-    """
-
-    """
-
-    return ''
+    """Call logger.dict_to_str() to generate output."""
+    mapping = {ERR_KEY: '*** Key error.', ERR_VAL: '*** Value error.'}
+    config = {'sep': ': ', 'indent': '--  ', 'trim_key': 20, 'trim_val': 10}
+    return logger.dict_to_tree(log, mapping, config)
 
 def walk(d, path):
     """Walk dict d using path as sequential list of keys, return last value."""
