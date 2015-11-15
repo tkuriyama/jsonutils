@@ -1,11 +1,11 @@
 """JSON Lightweight Schema.
 """
 
+from collections import defaultdict
 import sys
 import re
 import json
 import pickle
-from collections import defaultdict
 import logger
 
 ERR_KEY = hash('KEY ERROR')
@@ -146,7 +146,7 @@ def find_data_keys(data, schema_key):
 def gen_output(log):
     """Call logger.dict_to_str() to generate output."""
     mapping = {ERR_KEY: '*** Key error.', ERR_VAL: '*** Value error.'}
-    config = {'sep': ': ', 'indent': '--  ', 'trim_key': 20, 'trim_val': 10}
+    config = {'sep': ': ', 'indent': ' -- ', 'trim_key': 20, 'trim_val': 10}
     return logger.dict_to_tree(log, mapping, config)
 
 def walk(d, path):
@@ -219,6 +219,20 @@ def join_logs(schema_log, data_log):
     return ('\n>>> SCHEMA VALIDATION\n' + schema_log + '\n'
             '\n>>> DATA VALIDATION\n' + data_log + '\n')
 
+def load_schema(schema_path):
+    """Load schema from pickle file, adding root node."""
+    with open(schema_path, 'r') as f:
+        raw = pickle.load(f)
+        schema = {('root', str): raw}
+    return schema
+
+def load_data(data_path):
+    """Load data from JSON file, adding root node."""
+    with open(data_path, 'r') as f:
+        raw = json.load(f)
+        data = {'root': raw}
+    return data
+
 def main(schema_path, data_path):
     """Main.
     Print and return string of validation results.
@@ -227,13 +241,8 @@ def main(schema_path, data_path):
         data_path: string of path to data file
     """
 
-    with open(schema_path, 'r') as f:
-        raw = pickle.load(f)
-        schema = {('root', str): raw}
-
-    with open(data_path, 'r') as f:
-        raw = json.load(f)
-        data = {'root': raw}
+    schema = load_schema(schema_path)
+    data = load_data(data_path)
 
     _, schema_log = validate_schema(schema, data)
     data_log = validate_data(schema, data)
