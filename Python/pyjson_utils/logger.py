@@ -1,7 +1,8 @@
-"""Convert dict objects to pretty print strings.
+"""Convert dict objects from json_lws to pretty print strings.
+
 """
 
-# Dict to Tree
+from collections import defaultdict
 
 def trim(n):
     """Return a function that accepts a string and trims it to n chars."""
@@ -31,8 +32,50 @@ def format_node(text, indent, depth):
         Formatted string.
     """
     space = ' ' * ((len(indent) + 1) * (depth - 2))
-    sep = '|' + indent if depth > 1 else ''
-    return space + sep + text
+    leader = '|' + indent if depth > 1 else ''
+    return space + leader + text
+
+def filter_values(vals, error):
+    """Helper for filter_errors.
+    Return single value from list of values if a non-error term exists; else
+    return the error term.
+    """
+    return (vals[0] if len(vals) == 1 else
+            error if set(vals) == {error} else
+            [v for v in vals if v != error][0])
+
+def filter_errors(pairs, error):
+    """
+    Args
+        pairs: list of tuples
+        error:
+    Returns
+        List of
+    """
+    keys = defaultdict(list)
+    for pair in pairs:
+        fst, snd = pair
+        keys[fst].append(snd)
+
+    ret_pairs = []
+    for key in keys:
+        val = filter_values(keys[key], error)
+        ret_pairs.append((key, val))
+
+    return ret_pairs
+
+def dict_to_list(d, key, list_tree, error=''):
+    """
+    Args
+
+    Returns
+
+    """
+    if key not in d:
+        return list_tree
+    else:
+        keys = filter_errors(d[key].keys(), error) if error else d[key].keys()
+        return list_tree + [dict_to_list(d, x, [x]) for x in keys]
 
 def dict_to_tree(d, mapping={}, config={}):
     """
@@ -44,21 +87,3 @@ def dict_to_tree(d, mapping={}, config={}):
 
     """
 
-    sep, indent, trim_key, trim_val = parse_config(config)
-
-    output = []
-
-    print_stack = [(key, d[key], 0) for key, val in d.items()]
-    while print_stack:
-        key, val, depth = print_stack.pop()
-        print_key = sep.join(key) if is_iter(key) else str(key)
-        output.append((format_node(print_key, indent, depth)))
-
-        if isinstance(val, dict):
-            next_keys = [(k, val[d], depth + 1) for k, v in val.items()]
-            print_stack.extend(next_keys)
-        else:
-            print_val = sep.join(val) if is_iter(val) else str(val)
-            output.append((format_node(print_val, indent, depth + 1)))
-
-    return '\n'.join(output)

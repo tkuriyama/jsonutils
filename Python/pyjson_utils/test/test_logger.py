@@ -15,7 +15,7 @@ class TestDictToTreeHelpers:
         assert f('qweouhqno') == ''
 
     def test_parse_config_default(self):
-        """Test parse_config with empty dict passed."""
+        """Test hard-coded defaults in parse_config with empty dict passed."""
         f = logger.parse_config
         sep, indent, trim_key, trim_val = f({})
         test = 'oahdubowbfocbqeocq18boqbsf8g19oubwdoqbs9c91brqsdc'
@@ -37,3 +37,47 @@ class TestDictToTreeHelpers:
         f = logger.format_node
         assert f('a', '----', 1) == 'a'
         assert f('a', '----', 2) == '|----a'
+
+    def test_filter_values(self):
+        """Test value filtering (helper function to filter_errors)."""
+        f = logger.filter_values
+        vals = [1, 0, 0, 0, 0, 0]
+        assert f(vals, 0) == 1
+        vals = [0, 0, 0, 0]
+        assert f(vals, 0) == 0
+
+    def test_filter_errors_single(self):
+        """Test list error term filtering, single error."""
+        f = logger.filter_errors
+        pairs = [('a', 'hi'), ('a', 'error'), ('b', 'hi')]
+        filtered = [('a', 'hi'), ('b', 'hi')]
+        assert f(pairs, 'error') == filtered
+
+    def test_filter_errors_multiple(self):
+        """Test list error term filtering, multiple errors."""
+        f = logger.filter_errors
+        pairs = [('a', 'hi'), ('a', 'error'), ('a', 'error'),
+                 ('b', 'hi'), ('b', 'error')]
+        filtered = [('a', 'hi'), ('b', 'hi')]
+        assert f(pairs, 'error') == filtered
+
+    def test_filter_errors_only(self):
+        """Test list error term filtering, only errors."""
+        f = logger.filter_errors
+        pairs = [('a', 'error'), ('b', 'error')]
+        filtered = [('a', 'error'), ('b', 'error')]
+        assert f(pairs, 'error') == filtered
+
+    def test_dict_to_list_basic(self):
+        """Test dict_to_list using normal dicts."""
+        f = logger.dict_to_list
+        simple_d = {'root': ['a', 'b']}
+        flat_list = ['root', ['a'], ['b']]
+        assert f(simple_d, 'root', ['root']) == flat_list
+        nested_d = {'root': ['a', 'b'],
+                    'a': ['one', 'two']}
+        nested_list = ['root', ['a', ['one'], ['two']], ['b']]
+        assert f(nested_d, 'root', ['root']) == nested_list
+
+    def test_dict_to_list_error(self):
+        """"""
