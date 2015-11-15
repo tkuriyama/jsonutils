@@ -40,7 +40,7 @@ class TestDictToTreeHelpers:
 
     def test_filter_values(self):
         """Test value filtering (helper function to filter_errors)."""
-        f = logger.filter_values
+        f = logger.filter_errors
         vals = [1, 0, 0, 0, 0, 0]
         assert f(vals, 0) == 1
         vals = [0, 0, 0, 0]
@@ -48,14 +48,14 @@ class TestDictToTreeHelpers:
 
     def test_filter_errors_single(self):
         """Test list error term filtering, single error."""
-        f = logger.filter_errors
+        f = logger.filter_keys
         pairs = [('a', 'hi'), ('a', 'error'), ('b', 'hi')]
         filtered = [('a', 'hi'), ('b', 'hi')]
         assert f(pairs, 'error') == filtered
 
     def test_filter_errors_multiple(self):
         """Test list error term filtering, multiple errors."""
-        f = logger.filter_errors
+        f = logger.filter_keys
         pairs = [('a', 'hi'), ('a', 'error'), ('a', 'error'),
                  ('b', 'hi'), ('b', 'error')]
         filtered = [('a', 'hi'), ('b', 'hi')]
@@ -63,14 +63,14 @@ class TestDictToTreeHelpers:
 
     def test_filter_errors_only(self):
         """Test list error term filtering, only errors."""
-        f = logger.filter_errors
+        f = logger.filter_keys
         pairs = [('a', 'error'), ('b', 'error')]
         filtered = [('a', 'error'), ('b', 'error')]
         assert f(pairs, 'error') == filtered
 
-    def test_dict_to_list_basic(self):
+    def test_dict_to_tree_basic(self):
         """Test dict_to_list using normal dicts."""
-        f = logger.dict_to_list
+        f = logger.dict_to_tree
         simple_d = {'root': ['a', 'b']}
         flat_list = ['root', ['a'], ['b']]
         assert f(simple_d, 'root', ['root']) == flat_list
@@ -79,5 +79,6 @@ class TestDictToTreeHelpers:
         nested_list = ['root', ['a', ['one'], ['two']], ['b']]
         assert f(nested_d, 'root', ['root']) == nested_list
 
-    def test_dict_to_list_error(self):
+    def test_dict_to_tree_error(self):
         """"""
+        f = logger.dict_to_tree

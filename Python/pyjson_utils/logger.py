@@ -4,6 +4,8 @@
 
 from collections import defaultdict
 
+# Print Helpers
+
 def trim(n):
     """Return a function that accepts a string and trims it to n chars."""
     def inner(string):
@@ -35,8 +37,19 @@ def format_node(text, indent, depth):
     leader = '|' + indent if depth > 1 else ''
     return space + leader + text
 
-def filter_values(vals, error):
-    """Helper for filter_errors.
+# Data Helpers
+
+def flatten_list(nested):
+    """Accepts arbitrarily nested lists and returns generator for flat list."""
+    for outer in nested:
+        if isinstance(outer, list):
+            for inner in flatten_list(outer):
+                yield inner
+        else:
+            yield outer
+
+def filter_errors(vals, error):
+    """Helper for filter_keys.
     Return single value from list of values if a non-error term exists; else
     return the error term.
     """
@@ -44,8 +57,9 @@ def filter_values(vals, error):
             error if set(vals) == {error} else
             [v for v in vals if v != error][0])
 
-def filter_errors(pairs, error):
-    """
+def filter_keys(pairs, error):
+    """Take list of keys and filter out redundant values.
+    Each
     Args
         pairs: list of tuples
         error:
@@ -59,23 +73,28 @@ def filter_errors(pairs, error):
 
     ret_pairs = []
     for key in keys:
-        val = filter_values(keys[key], error)
+        val = filter_errors(keys[key], error)
         ret_pairs.append((key, val))
 
     return ret_pairs
 
-def dict_to_list(d, key, list_tree, error=''):
-    """
+def dict_to_tree(d, key, tree, depth=0, error=''):
+    """Transform dict into nested list of values representing tree form.
+    Generic function if called
     Args
-
+        d: dict to transform
+        key: initial key value ("root" of dict)
+        tree: list, usually initialized as singleton [(key, 0)]
+        error: error value to filter for, optioanl
     Returns
-
+        Nested list of values.
     """
     if key not in d:
-        return list_tree
+        return tree
     else:
-        keys = filter_errors(d[key].keys(), error) if error else d[key].keys()
-        return list_tree + [dict_to_list(d, x, [x]) for x in keys]
+        keys = filter_keys(d[key], error) if error else d[key]
+        return tree + [dict_to_tree(d, x, [(x, depth + 1)], depth + 1)
+                       for x in keys]
 
 def dict_to_tree(d, mapping={}, config={}):
     """
@@ -86,4 +105,12 @@ def dict_to_tree(d, mapping={}, config={}):
     Returns
 
     """
+
+    tree_list = dict_to_tree(d)
+    flat_list = flatten_list(list(tree_list))
+
+    sep, indent, trim_key, trim_val = parse_config(config)
+    output = [format_node(val, indent, depth) for val, depth in flat_list]
+
+    return '\n'.join(output)
 
