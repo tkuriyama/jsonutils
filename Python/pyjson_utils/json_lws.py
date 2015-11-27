@@ -145,8 +145,11 @@ def find_data_keys(data, schema_key):
 
 def node_to_str(node):
     """"""
-    key, val = node
-    return ': '.join([key[:20], node[:10]])
+    if len(node) == 2:
+        key, val = node
+    else:
+        key, val = node, ''
+    return ': '.join([key[:20], str(node)[:10]])
 
 def gen_schema_output(log):
     """Call logger.dict_to_str() to generate output."""
