@@ -143,11 +143,16 @@ def find_data_keys(data, schema_key):
 
 # Schema Validation
 
-def gen_output(log):
+def node_to_str(node):
+    """"""
+    key, val = node
+    return ': '.join([key[:20], node[:10]])
+
+def gen_schema_output(log):
     """Call logger.dict_to_str() to generate output."""
-    mapping = {ERR_KEY: '*** Key error.', ERR_VAL: '*** Value error.'}
-    config = {'sep': ': ', 'indent': ' -- ', 'trim_key': 20, 'trim_val': 10}
-    return logger.dict_to_tree(log, mapping, config)
+    error_dict = {ERR_KEY: '*** Key error.', ERR_VAL: '*** Value error.'}
+    root, base_tree = ('root', 'root'), [('root', 0)]
+    return logger.gen_log(log, root, base_tree, node_to_str, error_dict)
 
 def walk(d, path):
     """Walk dict d using path as sequential list of keys, return last value."""
@@ -203,7 +208,7 @@ def validate_schema(schema, data):
                 node = d_val if valid_data_val(s_val, d_val) else ERR_VAL
                 log[(prev_s, prev_d)].append((s_key[0], node))
 
-    return log, gen_output(log)
+    return log
 
 # Data Validation
 
@@ -244,9 +249,11 @@ def main(schema_path, data_path):
     schema = load_schema(schema_path)
     data = load_data(data_path)
 
-    _, schema_log = validate_schema(schema, data)
+    log = validate_schema(schema, data)
+    schema_out = gen_schema_output(log)
     data_log = validate_data(schema, data)
-    log = join_logs(schema_log, data_log)
+
+    log = join_logs(schema_out, data_log)
 
     print log
     return log

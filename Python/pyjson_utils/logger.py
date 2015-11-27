@@ -6,36 +6,23 @@ from collections import defaultdict
 
 # Print Helpers
 
-def trim(n):
-    """Return a function that accepts a string and trims it to n chars."""
-    def inner(string):
-        return string[:n]
-    return inner
-
-def parse_config(config):
-    """Parse config dictionary, return default values if necessary."""
-    sep = config['sep'] if 'sep' in config else ': '
-    indent = config['indent'] if 'indent' in config else ' -- '
-    trim_key = trim(config['trim_key']) if 'trim_key' in config else trim(20)
-    trim_val = trim(config['trim_val']) if 'trim_val' in config else trim(20)
-    return sep, indent, trim_key, trim_val
-
 def is_iter(arg):
     """Return True if argument is iterable."""
     return isinstance(arg, list) or isinstance(arg, tuple)
 
-def format_node(text, indent, depth):
-    """
+def format_node(node, indent, depth, to_str=str):
+    """Return string of graph node based on arguments.
     Args
-        text: string of node to print
+        node: string of node to print
         indent: string of tree indentation chars
         depth: int of tree depth, 0 = root
+        to_str: function to convert node to string, by default str
     Returns
         Formatted string.
     """
-    space = ' ' * ((len(indent) + 1) * (depth - 2))
-    leader = '|' + indent if depth > 1 else ''
-    return space + leader + text
+    space = ' ' * ((len(indent) + 1) * (depth - 1))
+    leader = '|' + indent if depth > 0 else ''
+    return space + leader + to_str(node)
 
 # Data Helpers
 
@@ -58,13 +45,14 @@ def filter_errors(vals, error):
             [v for v in vals if v != error][0])
 
 def filter_keys(pairs, error):
-    """Take list of keys and filter out redundant values.
-    Each
+    """Take list of (key, value) tuples and filter out redundant values.
+    For every key, all error values are redundant if there is a non-error value.
     Args
-        pairs: list of tuples
-        error:
+        pairs: list of (key, value) tuples
+        error: error value to match values against
     Returns
-        List of
+        List of filtered (key, value) tuples; the filtered list should contain
+        unique keys only.
     """
     keys = defaultdict(list)
     for pair in pairs:
@@ -80,14 +68,17 @@ def filter_keys(pairs, error):
 
 def dict_to_tree(d, key, tree, depth=0, error=''):
     """Transform dict into nested list of values representing tree form.
-    Generic function if called
+    Dict should be a graph in adjacency list form, i.e. mapping one node to a
+    list of one or more nodes. The resulting nested list is in depth-first
+    form, with the level of list nesting corresponding to the depth of the
+    node(s).
     Args
         d: dict to transform
         key: initial key value ("root" of dict)
-        tree: list, usually initialized as singleton [(key, 0)]
-        error: error value to filter for, optioanl
+        tree: list, initialized as singleton [(root value, 0)]
+        error: error value to filter for, optional
     Returns
-        Nested list of values.
+        Nested list of (value, int of depth) pairs.
     """
     if key not in d:
         return tree
@@ -96,21 +87,26 @@ def dict_to_tree(d, key, tree, depth=0, error=''):
         return tree + [dict_to_tree(d, x, [(x, depth + 1)], depth + 1)
                        for x in keys]
 
-def dict_to_tree(d, mapping={}, config={}):
+def gen_log(graph, root, base_tree, node_to_str, error_dict, indent=' -- '):
     """
     Args
-        d
-        mapping
-        config
+        graph
+        root
+        base_tree
+        node_to_str
+        error_dict
+        indent
     Returns
 
     """
 
-    tree_list = dict_to_tree(d)
+    tree_list = dict_to_tree(graph, root, base_tree)
     flat_list = flatten_list(list(tree_list))
 
-    sep, indent, trim_key, trim_val = parse_config(config)
-    output = [format_node(val, indent, depth) for val, depth in flat_list]
+    # sep, indent, trim_key, trim_val = parse_config(config)
+
+    output = [format_node(val, indent, depth, node_to_str)
+              for val, depth in flat_list]
 
     return '\n'.join(output)
 

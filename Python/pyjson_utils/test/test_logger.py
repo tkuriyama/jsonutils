@@ -5,26 +5,6 @@ from pyjson_utils import logger
 class TestDictToTreeHelpers:
     """Test the helper functions for dict_to_tree."""
 
-    def test_trim(self):
-        """Test trimming function with different parameters."""
-        f = logger.trim(10)
-        assert f('0123456789abcdefg') == '0123456789'
-        f = logger.trim(5)
-        assert f('abcdefghijk') == 'abcde'
-        f = logger.trim(0)
-        assert f('qweouhqno') == ''
-
-    def test_parse_config_default(self):
-        """Test hard-coded defaults in parse_config with empty dict passed."""
-        f = logger.parse_config
-        sep, indent, trim_key, trim_val = f({})
-        test = 'oahdubowbfocbqeocq18boqbsf8g19oubwdoqbs9c91brqsdc'
-        test_trim = logger.trim(20)
-        assert sep == ': '
-        assert indent == ' -- '
-        assert trim_key(test) == test_trim(test)
-        assert trim_val(test) == test_trim(test)
-
     def test_is_iter(self):
         """Test iterable type tester."""
         f = logger.is_iter
@@ -35,11 +15,21 @@ class TestDictToTreeHelpers:
     def test_format_node(self):
         """Test node to string function."""
         f = logger.format_node
-        assert f('a', '----', 1) == 'a'
-        assert f('a', '----', 2) == '|----a'
+        assert f('a', '----', 1) == '|----a'
+        assert f('a', '----', 2) == '     |----a'
 
-    def test_filter_values(self):
-        """Test value filtering (helper function to filter_errors)."""
+    def test_flatten_list(self):
+        """Test flattening of nested lists."""
+        f = logger.flatten_list
+        nested = [1, [2, 3, [[4], 5]]]
+        assert list(f(nested)) == [1, 2, 3, 4, 5]
+        nested = [[[1]]]
+        assert list(f(nested)) == [1]
+        flat = [1, 2]
+        assert list(f(flat)) == [1, 2]
+
+    def test_filter_errors(self):
+        """Test error filtering (helper function to filter_keys)."""
         f = logger.filter_errors
         vals = [1, 0, 0, 0, 0, 0]
         assert f(vals, 0) == 1
@@ -68,16 +58,16 @@ class TestDictToTreeHelpers:
         filtered = [('a', 'error'), ('b', 'error')]
         assert f(pairs, 'error') == filtered
 
-    def test_dict_to_tree_basic(self):
-        """Test dict_to_list using normal dicts."""
+    def test_dict_to_tree_simple(self):
+        """Test dict_to_tree simple dicts."""
         f = logger.dict_to_tree
         simple_d = {'root': ['a', 'b']}
-        flat_list = ['root', ['a'], ['b']]
-        assert f(simple_d, 'root', ['root']) == flat_list
-        nested_d = {'root': ['a', 'b'],
-                    'a': ['one', 'two']}
-        nested_list = ['root', ['a', ['one'], ['two']], ['b']]
-        assert f(nested_d, 'root', ['root']) == nested_list
+        flat_list = [('root', 0), [('a', 1)], [('b', 1)]]
+        assert f(simple_d, 'root', [('root', 0)]) == flat_list
+        nested_d = {'root': ['a', 'b'], 'a': ['one', 'two']}
+        nested_list = [('root', 0), [('a', 1), [('one', 2)], [('two', 2)]],
+                       [('b', 1)]]
+        assert f(nested_d, 'root', [('root', 0)]) == nested_list
 
     def test_dict_to_tree_error(self):
         """"""
