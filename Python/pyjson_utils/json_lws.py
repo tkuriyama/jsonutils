@@ -144,17 +144,17 @@ def find_data_keys(data, schema_key):
 # Schema Validation
 
 def node_to_str(node):
-    """"""
+    """Unpack node and convert to string."""
     if len(node) == 2:
         key, val = node
     else:
         key, val = node, ''
-    return ': '.join([key[:20], str(node)[:10]])
+    return ': '.join([str(key)[:20], str(val)[:20]])
 
 def gen_schema_output(log):
     """Call logger.dict_to_str() to generate output."""
     error_dict = {ERR_KEY: '*** Key error.', ERR_VAL: '*** Value error.'}
-    root, base_tree = ('root', 'root'), [('root', 0)]
+    root, base_tree = ('root', 'root'), [(('root', 'root'), 0)]
     return logger.gen_log(log, root, base_tree, node_to_str, error_dict)
 
 def walk(d, path):
@@ -224,8 +224,8 @@ def validate_data(schema, data):
 
 def join_logs(schema_log, data_log):
     """Join logs strings into single string."""
-    return ('\n>>> SCHEMA VALIDATION\n' + schema_log + '\n'
-            '\n>>> DATA VALIDATION\n' + data_log + '\n')
+    return ('\n> SCHEMA VALIDATION\n\n' + schema_log + '\n\n'
+            '\n> DATA VALIDATION\n\n' + data_log + '\n')
 
 def load_schema(schema_path):
     """Load schema from pickle file, adding root node."""
@@ -256,10 +256,10 @@ def main(schema_path, data_path):
     schema_out = gen_schema_output(log)
     data_log = validate_data(schema, data)
 
-    log = join_logs(schema_out, data_log)
+    output = join_logs(schema_out, data_log)
 
-    print log
-    return log
+    print output
+    return output
 
 if __name__ == '__main__':
     if len(sys.argv) == 3:

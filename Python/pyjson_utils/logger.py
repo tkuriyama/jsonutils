@@ -101,9 +101,7 @@ def gen_log(graph, root, base_tree, node_to_str, error_dict, indent=' -- '):
     """
 
     tree_list = dict_to_tree(graph, root, base_tree)
-    flat_list = flatten_list(list(tree_list))
-
-    # sep, indent, trim_key, trim_val = parse_config(config)
+    flat_list = list(flatten_list(tree_list))
 
     output = [format_node(val, indent, depth, node_to_str)
               for val, depth in flat_list]
