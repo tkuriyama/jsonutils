@@ -143,13 +143,21 @@ def find_data_keys(data, schema_key):
 
 # Schema Validation
 
+def trim(item, max_len=20):
+    """Return string representation of item, trimmed to max length."""
+    string = str(item)
+    string = string[:max_len] + '...' if len(string) > max_len else string
+    return string
+
 def node_to_str(node):
     """Unpack node and convert to string."""
-    if len(node) == 2:
+    if len(node) == 2 and isinstance(node, tuple):
         key, val = node
     else:
         key, val = node, ''
-    return ': '.join([str(key)[:20], str(val)[:20]])
+
+    key, val = trim(key), trim(val)
+    return ': '.join([key, val])
 
 def gen_schema_output(log):
     """Call logger.dict_to_str() to generate output."""
@@ -208,8 +216,8 @@ def validate_schema(schema, data):
                 log[(prev_s, prev_d)].append((s_key[0], d_key))
             # end of branch, check data value against schema
             else:
-                node = d_val if valid_data_val(s_val, d_val) else ERR_VAL
-                log[(prev_s, prev_d)].append((s_key[0], node))
+                val = d_val if valid_data_val(s_val, d_val) else ERR_VAL
+                log[(prev_s, prev_d)].append((s_key[0], val))
 
     return log
 

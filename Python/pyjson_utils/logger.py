@@ -4,6 +4,9 @@
 
 from collections import defaultdict
 
+ERR_KEY = hash('KEY ERROR')
+ERR_VAL = hash('VAL ERROR')
+
 # Print Helpers
 
 def is_iter(arg):
@@ -35,21 +38,20 @@ def flatten_list(nested):
         else:
             yield outer
 
-def filter_errors(vals, error):
+def filter_errors(vals, errors):
     """Helper for filter_keys.
     Return single value from list of values if a non-error term exists; else
     return the error term.
     """
-    return (vals[0] if len(vals) == 1 else
-            error if set(vals) == {error} else
-            [v for v in vals if v != error][0])
+    return ([errors[ERR_VAL]] if vals == [ERR_VAL] else
+            [v for v in vals if v != ERR_VAL])
 
-def filter_keys(pairs, error):
+def filter_keys(pairs, errors):
     """Take list of (key, value) tuples and filter out redundant values.
     For every key, all error values are redundant if there is a non-error value.
     Args
         pairs: list of (key, value) tuples
-        error: error value to match values against
+        errors:
     Returns
         List of filtered (key, value) tuples; the filtered list should contain
         unique keys only.
@@ -61,12 +63,12 @@ def filter_keys(pairs, error):
 
     ret_pairs = []
     for key in keys:
-        val = filter_errors(keys[key], error)
-        ret_pairs.append((key, val))
+        vals = filter_errors(keys[key], errors)
+        ret_pairs.extend([(key, val) for val in vals])
 
     return ret_pairs
 
-def dict_to_tree(d, key, tree, depth=0, error=''):
+def dict_to_tree(d, key, tree, errors='', depth=0):
     """Transform dict into nested list of values representing tree form.
     Dict should be a graph in adjacency list form, i.e. mapping one node to a
     list of one or more nodes. The resulting nested list is in depth-first
@@ -76,15 +78,15 @@ def dict_to_tree(d, key, tree, depth=0, error=''):
         d: dict to transform
         key: initial key value ("root" of dict)
         tree: list, initialized as singleton [(root value, 0)]
-        error: error value to filter for, optional
+        errors:
     Returns
         Nested list of (value, int of depth) pairs.
     """
     if key not in d:
         return tree
     else:
-        keys = filter_keys(d[key], error) if error else d[key]
-        return tree + [dict_to_tree(d, x, [(x, depth + 1)], depth + 1)
+        keys = filter_keys(d[key], errors) if errors else d[key]
+        return tree + [dict_to_tree(d, x, [(x, depth + 1)], errors, depth + 1)
                        for x in keys]
 
 def gen_log(graph, root, base_tree, node_to_str, error_dict, indent=' -- '):
@@ -100,7 +102,7 @@ def gen_log(graph, root, base_tree, node_to_str, error_dict, indent=' -- '):
 
     """
 
-    tree_list = dict_to_tree(graph, root, base_tree)
+    tree_list = dict_to_tree(graph, root, base_tree, error_dict)
     flat_list = list(flatten_list(tree_list))
 
     output = [format_node(val, indent, depth, node_to_str)
