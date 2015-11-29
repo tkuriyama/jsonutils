@@ -183,3 +183,33 @@ class TestValidateKeys:
         schema_key = ('ticker', str, r'[A-Z]+', '+')
         assert json_lws.find_data_keys(data, schema_key) == ['C', 'BAC']
 
+class TestSchemaValidation:
+    """Test functions for schema validation."""
+
+    def test_trim(self):
+        """Test basic string trimming."""
+        s1 = 'esrdctfvubfiqisqwduonq'
+        assert json_lws.trim(s1, 5) == 'esrdc...'
+        assert json_lws.trim(s1) == 'esrdctfvubfiqisqwduo...'
+        s2 = 'asdasdasd'
+        assert json_lws.trim(s2) == 'asdasdasd'
+
+    def test_node_to_str(self):
+        """Test node unpacking for printing schema validation log."""
+        f = json_lws.node_to_str
+        # normal
+        assert f(('a', 'b')) == 'a: b'
+        # exception
+        assert f(('a',),) == "('a',): "
+        assert f('a') == 'a: '
+
+    def test_walk(self):
+        """Test dictionary walking."""
+        f = json_lws.walk
+        d = {'a': {'b': 'c'}}
+        assert f(d, []) == d
+        assert f(d, ['a']) == {'b': 'c'}
+        assert f(d, ['a', 'b']) == 'c'
+
+    def test_update_stack(self):
+        """"""
