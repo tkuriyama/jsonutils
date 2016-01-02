@@ -1,16 +1,9 @@
 """Test cases for logger module, assumes Pytest."""
 
-from pyjson_utils import logger
+from pytextutils import logger
 
 class TestDictToTreeHelpers:
     """Test the helper functions for dict_to_tree."""
-
-    def test_is_iter(self):
-        """Test iterable type tester."""
-        f = logger.is_iter
-        assert f([1, 2, 3]) is True
-        assert f((1, 2, 3)) is True
-        assert f({'a': 1}) is False
 
     def test_format_node(self):
         """Test node to string function."""

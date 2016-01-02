@@ -1,6 +1,6 @@
 """Test cases for json_lws module, assumes Pytest."""
 
-from pyjson_utils import json_lws
+from pytextutils import json_lws
 
 class TestTypeValidationHelpers:
     """Test the various type validation helper functions."""

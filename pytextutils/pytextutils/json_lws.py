@@ -8,8 +8,10 @@ import json
 import pickle
 import logger
 
-ERR_KEY = hash('KEY ERROR')
-ERR_VAL = hash('VAL ERROR')
+ERRORS = {'key': hash('error key'),
+          'key_str': '*** Key error.',
+          'val': hash('error value'),
+          'val_str': '*** Value error.'}
 
 # Type Validation Helpers
 
@@ -161,9 +163,8 @@ def node_to_str(node):
 
 def gen_schema_output(log):
     """Call logger.dict_to_str() to generate output."""
-    error_dict = {ERR_KEY: '*** Key error.', ERR_VAL: '*** Value error.'}
     root, base_tree = ('root', 'root'), [(('root', 'root'), 0)]
-    return logger.gen_log(log, root, base_tree, node_to_str, error_dict)
+    return logger.gen_log(log, root, base_tree, node_to_str, ERRORS)
 
 def walk(d, path):
     """Walk dict d using path as sequential list of keys, return last value."""
@@ -204,7 +205,7 @@ def validate_schema(schema, data):
         # error case: schema key not found in data
         d_keys = find_data_keys(data_sub, s_key)
         if not d_keys:
-            log[(prev_s, prev_d)].append((s_key[0], ERR_KEY))
+            log[(prev_s, prev_d)].append((s_key[0], ERRORS['key']))
             continue
 
         s_val = schema_sub[s_key]
@@ -216,7 +217,7 @@ def validate_schema(schema, data):
                 log[(prev_s, prev_d)].append((s_key[0], d_key))
             # end of branch, check data value against schema
             else:
-                val = d_val if valid_data_val(s_val, d_val) else ERR_VAL
+                val = d_val if valid_data_val(s_val, d_val) else ERRORS['val']
                 log[(prev_s, prev_d)].append((s_key[0], val))
 
     return log
