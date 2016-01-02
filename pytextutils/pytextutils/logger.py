@@ -27,15 +27,17 @@ def flatten_list(nested):
         else:
             yield outer
 
-def filter_error_vals(vals, errors):
+def filter_errors(seq, errors):
     """Helper for filter_keys.
     Return single value from list of values if a non-error term exists; else
     return the string version of the error term.
     """
-    err = errors['val']
-    err_str = errors['val_str']
-    return ([err_str] if set(vals) == set([err]) else
-            [v for v in vals if v != err])
+    key_err, val_err = errors['key'], errors['val']
+    key_err_str, val_err_str = errors['key_str'], errors['val_str']
+
+    return ([key_err_str] if set(seq) == set([key_err]) else
+            [val_err_str] if set(seq) == set([val_err]) else
+            [s for s in seq if s not in (key_err, val_err)])
 
 def filter_keys(pairs, errors):
     """Take list of (key, value) tuples and filter out redundant values.
@@ -54,7 +56,7 @@ def filter_keys(pairs, errors):
 
     ret_pairs = []
     for key in keys:
-        vals = filter_error_vals(keys[key], errors)
+        vals = filter_errors(keys[key], errors)
         ret_pairs.extend([(key, val) for val in vals])
 
     return ret_pairs
@@ -83,9 +85,8 @@ node(s).
 
 def parse_errors(nodes, errors):
     """"""
-    print nodes
-    key_errors = len([1 for key, val in nodes if key == errors['key_str']])
-    val_errors = len([1 for key, val in nodes if val == errors['val_str']])
+    key_errors = len([1 for schema, data in nodes if data == errors['key_str']])
+    val_errors = len([1 for schema, data in nodes if data == errors['val_str']])
 
     output = 'Key Errors:\t' + str(key_errors)
     output += '\nValue Errors:\t' + str(val_errors)
