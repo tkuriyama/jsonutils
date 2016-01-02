@@ -212,4 +212,15 @@ class TestSchemaValidation:
         assert f(d, ['a', 'b']) == 'c'
 
     def test_update_stack(self):
-        """"""
+        """Test stack updating."""
+        f = json_lws.update_stack
+        s_path = [('a', str), ('b', str)]
+        d_path = ['a', 'b']
+        schema = {('a', str): {('b', str): {('c', str): {('d', str): 'e'}}}}
+        s_key = ('c', str)
+        d_key = 'c'
+        expected = [([('a', str), ('b', str), ('c', str)],
+                     ('d', str),
+                     ['a', 'b', 'c'])]
+        assert f(s_path, d_path, schema, s_key, d_key) == expected
+

@@ -1,4 +1,10 @@
-"""JSON Lightweight Schema.
+"""JSON Lightweight Schema (LWS).
+
+Validate both schema against data and data against schema, where
+schema is a pickled dictionary and data is JSON.
+
+Generate graph of data as adjacency list and pass to json_logger for
+generating a string of validation report.
 """
 
 from collections import defaultdict
@@ -6,7 +12,7 @@ import sys
 import re
 import json
 import pickle
-import logger
+import json_logger
 
 ERRORS = {'key': hash('error key'),
           'key_str': '*** Key error.',
@@ -164,7 +170,7 @@ def node_to_str(node):
 def gen_schema_output(log):
     """Call logger.dict_to_str() to generate output."""
     root, base_tree = ('root', 'root'), [(('root', 'root'), 0)]
-    return logger.gen_log(log, root, base_tree, node_to_str, ERRORS)
+    return json_logger.gen_log(log, root, base_tree, node_to_str, ERRORS)
 
 def walk(d, path):
     """Walk dict d using path as sequential list of keys, return last value."""
@@ -191,6 +197,11 @@ def update_stack(s_path, d_path, schema, s_key, d_key):
 
 def validate_schema(schema, data):
     """Schema-centric validation.
+    Args
+        schema: dict of schema
+        data: dict of data
+    Returns
+        string of validation graph as adjacency list
     """
 
     log = defaultdict(list)
@@ -225,7 +236,12 @@ def validate_schema(schema, data):
 # Data Validation
 
 def validate_data(schema, data):
-    """
+    """Data-centric validation.
+    Args
+        schema: dict of schema
+        data: dict of data
+    Returns
+        string of validation graph as adjacency list
     """
     return ''
 
@@ -256,6 +272,8 @@ def main(schema_path, data_path):
     Args
         schema_path: string of path to schema file
         data_path: string of path to data file
+    Returns
+        string of validation report
     """
 
     schema = load_schema(schema_path)
