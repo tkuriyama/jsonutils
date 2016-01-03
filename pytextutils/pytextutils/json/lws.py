@@ -15,11 +15,11 @@ import pickle
 import json_logger
 
 ERRORS = {'key': hash('error key'),
-          'key_str': '*** Key error.',
+          'key_str': '*** Key error',
           'val': hash('error value'),
-          'val_str': '*** Value error.'}
+          'val_str': '*** Value error'}
 
-# Type Validation Helpers
+# Type Validation
 
 def valid_text(val, rule):
     """Return True if regex fully matches non-empty string of value."""
@@ -142,6 +142,8 @@ def find_data_keys(data, schema_key):
     Args
         data: dict of data
         schema_key: tuple of schema key definition
+    Returns
+        list of found keys
     """
     dtype, rule, repeat = parse_schema_key(schema_key)
     found_keys = [data_key for data_key in data
@@ -149,7 +151,23 @@ def find_data_keys(data, schema_key):
 
     return found_keys if valid_length(repeat, found_keys) else []
 
-# Schema Validation
+def find_schema_keys(schema, data_key):
+    """Return all keys in schema that match the data key definition.
+    Args
+        data: dict of schema
+        data_key: string of data key
+    Returns
+        list of found keys
+    """
+    found_keys = []
+    for schema_key in schema:
+        dtype, rule, _ = parse_schema_key(schema_key)
+        if valid_data_key(data_key, dtype, rule):
+            found_keys.append(schema_key)
+
+    return found_keys
+
+# Validation Helpers
 
 def trim(item, max_len=20):
     """Return string representation of item, trimmed to max length."""
@@ -167,33 +185,38 @@ def node_to_str(node):
     key, val = trim(key), trim(val)
     return ': '.join([key, val])
 
-def gen_schema_output(log):
-    """Call logger.dict_to_str() to generate output."""
-    root, base_tree = ('root', 'root'), [(('root', 'root'), 0)]
-    return json_logger.gen_log(log, root, base_tree, node_to_str, ERRORS)
-
 def walk(d, path):
     """Walk dict d using path as sequential list of keys, return last value."""
     if not path: return d
     return walk(d[path[0]], path[1:])
 
-def update_stack(s_path, d_path, schema, s_key, d_key):
+def update_stack(fst_path, snd_path, fst, fst_key, snd_key):
     """Update validation stack.
-    Accepts schema and data path so far and returns next possible schema keys.
+    Accepts path walked in fst and snd dicts so far and returns next possible
+    keys in fst dict.
     Args
-        s_path: list of schema keys walked thus far
-        d_path: list of data keys walked thus far
-        schema: dict of schema
-        s_key: string of next schema key
-        d_key: string of next data key
+        fst_path: list of fst dict keys walked thus far
+        snd_path: list of snd dict keys walked thus far
+        fst: dict of fst dict
+        fst_key: string of next fst dict key
+        snd_key: string of next snd dict key
     Returns
         List of tuples, one tuple per next schema key:
         (updated s_path, string of next schema key, updated d_path).
     """
-    new_s_path = s_path + [s_key]
-    new_d_path = d_path + [d_key]
-    schema_keys = walk(schema, new_s_path).keys()
-    return [(new_s_path, new_s_key, new_d_path) for new_s_key in schema_keys]
+    new_fst_path = fst_path + [fst_key]
+    new_snd_path = snd_path + [snd_key]
+    fst_keys = walk(fst, new_fst_path).keys()
+
+    return [(new_fst_path, new_fst_key, new_snd_path)
+            for new_fst_key in fst_keys]
+
+# Schema Validation
+
+def gen_schema_output(log):
+    """Call logger.dict_to_str() to generate output."""
+    root, base_tree = ('root', 'root'), [(('root', 'root'), 0)]
+    return json_logger.gen_log(log, root, base_tree, node_to_str, ERRORS)
 
 def validate_schema(schema, data):
     """Schema-centric validation.
@@ -213,8 +236,8 @@ def validate_schema(schema, data):
         schema_sub = walk(schema, s_path)
         data_sub = walk(data, d_path)
 
-        # error case: schema key not found in data
         d_keys = find_data_keys(data_sub, s_key)
+        # error case: schema key not found in data
         if not d_keys:
             log[(prev_s, prev_d)].append((s_key[0], ERRORS['key']))
             continue
@@ -235,6 +258,11 @@ def validate_schema(schema, data):
 
 # Data Validation
 
+def gen_data_output(log):
+    """Call logger.dict_to_str() to generate output."""
+    root, base_tree = ('root', 'root'), [(('root', 'root'), 0)]
+    return json_logger.gen_log(log, root, base_tree, node_to_str, ERRORS)
+
 def validate_data(schema, data):
     """Data-centric validation.
     Args
@@ -243,7 +271,35 @@ def validate_data(schema, data):
     Returns
         string of validation graph as adjacency list
     """
-    return ''
+
+    log = defaultdict(list)
+
+    stack = update_stack([], [], data, 'root', ('root', str))
+    while stack:
+        d_path, d_key, s_path = stack.pop()
+        prev_d, prev_s = d_path[-1], s_path[-1][0]
+        data_sub = walk(data, d_path)
+        schema_sub = walk(schema, s_path)
+
+        s_keys = find_schema_keys(schema_sub, d_key)
+        # error case: data key not found in schema
+        if not s_keys:
+            log[(prev_d, prev_s)].append((d_key, ERRORS['key']))
+            continue
+
+        d_val = data_sub[d_key]
+        for s_key in s_keys:
+            s_val = schema_sub[s_key]
+            # not end of branch, add path to stack
+            if isinstance(d_val, dict):
+                stack.extend(update_stack(d_path, s_path, data, d_key, s_key))
+                log[(prev_d, prev_s)].append((d_key, s_key[0]))
+            # end of branch, check data value against schema
+            else:
+                val = s_val if valid_data_val(s_val, d_val) else ERRORS['val']
+                log[(prev_d, prev_s)].append((d_key, val))
+
+    return log
 
 # Main
 
@@ -268,7 +324,7 @@ def load_data(data_path):
 
 def main(schema_path, data_path):
     """Main.
-    Print and return string of validation results.
+    Return string of validation results.
     Args
         schema_path: string of path to schema file
         data_path: string of path to data file
@@ -279,18 +335,18 @@ def main(schema_path, data_path):
     schema = load_schema(schema_path)
     data = load_data(data_path)
 
-    log = validate_schema(schema, data)
-    schema_out = gen_schema_output(log)
+    schema_log = validate_schema(schema, data)
+    schema_out = gen_schema_output(schema_log)
     data_log = validate_data(schema, data)
+    data_out = gen_data_output(data_log)
 
-    output = join_logs(schema_out, data_log)
-
-    print output
+    output = join_logs(schema_out, data_out)
     return output
 
 if __name__ == '__main__':
     if len(sys.argv) == 3:
-        main(sys.argv[1], sys.argv[2])
+        output = main(sys.argv[1], sys.argv[2])
+        print output
     else:
         print 'Call with two arguments, schema pickle and data filenames.\n'
         print 'e.g. python json_lws_python.py schema.pkl data.json\n'

@@ -85,8 +85,8 @@ node(s).
 
 def parse_errors(nodes, errors):
     """"""
-    key_errors = len([1 for schema, data in nodes if data == errors['key_str']])
-    val_errors = len([1 for schema, data in nodes if data == errors['val_str']])
+    key_errors = len([1 for fst, snd in nodes if snd == errors['key_str']])
+    val_errors = len([1 for fst, snd in nodes if snd == errors['val_str']])
 
     output = 'Key Errors:\t' + str(key_errors)
     output += '\nValue Errors:\t' + str(val_errors)
