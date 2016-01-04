@@ -1,15 +1,16 @@
 from setuptools import setup, find_packages
 setup(
-    name = "Python Text Utilities",
+    name = "pytextutils",
     version = "0.1.3",
-    packages = find_packages('pytextutils.json'),
+    packages = ['pytextutils', 'pytextutils.json'],
     scripts = [],
 
+    tests_require = ['pytest'],
     install_requires = [],
     package_data = {},
 
     author = 'Taro Kuriyama',
     author_email = 'taro@tarokuriyama.com',
-    description = '',
+    description = "Python Text Utilities",
     license = 'MIT'
 )
