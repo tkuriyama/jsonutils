@@ -1,13 +1,13 @@
-"""Test cases for json_lws module, assumes Pytest."""
+"""Test cases for JSON lws module, assumes Pytest."""
 
-from pytextutils import json_lws
+from pytextutils.json import lws
 
 class TestTypeValidation:
     """Test the various type validation helper functions."""
 
     def test_valid_text_str(self):
         """Regex/function matches non-empty text (string)."""
-        f = json_lws.valid_text
+        f = lws.valid_text
         assert f('string', r'[a-z]*') is True
         assert f('string', r'string') is True
         assert f('string', r'[0-9]*') is False
@@ -17,7 +17,7 @@ class TestTypeValidation:
 
     def test_valid_text_unicode(self):
         """Regex/function matches non-empty text (unicode)."""
-        f = json_lws.valid_text
+        f = lws.valid_text
         assert f(u'string', r'[a-z]*') is True
         assert f(u'string', r'string') is True
         assert f(u'string', r'[0-9]*') is False
@@ -27,7 +27,7 @@ class TestTypeValidation:
 
     def test_valid_list(self):
         """Basic test cases."""
-        f = json_lws.valid_list
+        f = lws.valid_list
         assert f([1, 2, 3], lambda x: 2 in x) is True
         assert f([1, 2, 3], [1, 2, 3]) is True
         assert f([1, 2, 3], [1, 2]) is False
@@ -35,7 +35,7 @@ class TestTypeValidation:
 
     def test_valid_bool(self):
         """Basic test cases."""
-        f = json_lws.valid_bool
+        f = lws.valid_bool
         assert f(True, True) is True
         assert f(True, False) is False
         assert f(False, True) is False
@@ -43,27 +43,27 @@ class TestTypeValidation:
 
     def test_valid_null(self):
         """Always return True, as NoneType is assumed to be a given."""
-        f = json_lws.valid_null
+        f = lws.valid_null
         assert f(None, '') is True
         assert f('asdasdasd', '') is True
 
     def test_is_text(self):
         """Basic test cases."""
-        f = json_lws.is_text
+        f = lws.is_text
         assert f('test') is True
         assert f(u'test') is True
         assert f(True) is False
 
     def test_is_num(self):
         """Basic test cases."""
-        f = json_lws.is_num
+        f = lws.is_num
         assert f(2) is True
         assert f(2.0) is True
         assert f('tests') is False
 
     def test_classify(self):
         """Basic tests cases."""
-        f = json_lws.classify
+        f = lws.classify
         assert f(str) == 'text'
         assert f(unicode) == 'text'
         assert f(int) == 'num'
@@ -72,7 +72,7 @@ class TestTypeValidation:
 
     def test_classify_val(self):
         """Basic test cases."""
-        f = json_lws.classify_val
+        f = lws.classify_val
         assert f('test') == 'text'
         assert f(u'test') == 'text'
         assert f(123) == 'num'
@@ -87,21 +87,21 @@ class TestValidateValues:
     def test_unpack_1(self):
         """Ordinary value."""
         val = ('item name', str, r'name')
-        assert json_lws.parse_schema_val(val) == (str, 'name')
+        assert lws.parse_schema_val(val) == (str, 'name')
 
     def test_unpack_2(self):
         """String value with no matching provided."""
         val = ('item name', str)
-        assert json_lws.parse_schema_val(val) == (str, '.*')
+        assert lws.parse_schema_val(val) == (str, '.*')
 
     def test_unpack_3(self):
         """Non-string value with no matching provided."""
         val = ('item number', int)
-        assert json_lws.parse_schema_val(val) == (int, '')
+        assert lws.parse_schema_val(val) == (int, '')
 
     def test_match_types(self):
         """Test cases for type matching."""
-        f = json_lws.match_types
+        f = lws.match_types
         assert f(str, u'test') is True
         assert f(str, 'test') is True
         assert f(int, 123) is True
@@ -110,7 +110,7 @@ class TestValidateValues:
 
     def test_match_vals(self):
         """Test basic cases for match_vals."""
-        f = json_lws.match_vals
+        f = lws.match_vals
         schema_rule = r'[a-z]*'
         assert f(schema_rule, 'abc') is True
         assert f(schema_rule, 'ABC') is False
@@ -123,7 +123,7 @@ class TestValidateValues:
 
     def test_match_valid_data_val(self):
         """Test basic cases for schema validation against data values."""
-        f = json_lws.valid_data_val
+        f = lws.valid_data_val
         schema_val = ('some text', unicode, u'text')
         assert f(schema_val, 'text') is True
         assert f(schema_val, u'text') is True
@@ -143,21 +143,21 @@ class TestValidateKeys:
     def test_unpack_1(self):
         """Ordinary key."""
         key = ('item name', str, r'name', '+')
-        assert json_lws.parse_schema_key(key) == (str, 'name', '+')
+        assert lws.parse_schema_key(key) == (str, 'name', '+')
 
     def test_unpack_2(self):
         """Key with no repetition pattern specified."""
         key = ('item name', str, r'name')
-        assert json_lws.parse_schema_key(key) == (str, 'name', '')
+        assert lws.parse_schema_key(key) == (str, 'name', '')
 
     def test_unpack_3(self):
         """Key with no regex or repetition pattern specified."""
         key = ('item name', str)
-        assert json_lws.parse_schema_key(key) == (str, '.*', '')
+        assert lws.parse_schema_key(key) == (str, '.*', '')
 
     def test_valid_key(self):
         """Valid key is a string that matches the regex."""
-        f = json_lws.valid_data_key
+        f = lws.valid_data_key
         assert f('string', int, r'string') is False
         assert f('string', str, r'test') is False
         assert f(123, int, '123') is False
@@ -166,7 +166,7 @@ class TestValidateKeys:
 
     def test_valid_length(self):
         """Validate repetition pattern checking."""
-        f = json_lws.valid_length
+        f = lws.valid_length
         assert f('', [1]) is True
         assert f('+', [1, 1]) is True
         assert f('?', []) is True
@@ -181,7 +181,7 @@ class TestValidateKeys:
                 'BAC': 'Bank of America',
                 'random': 'random company'}
         schema_key = ('ticker', str, r'[A-Z]+', '+')
-        assert json_lws.find_data_keys(data, schema_key) == ['C', 'BAC']
+        assert lws.find_data_keys(data, schema_key) == ['C', 'BAC']
 
     def test_find_schema_keys(self):
         """Test basic scenario."""
@@ -191,7 +191,7 @@ class TestValidateKeys:
         data_key = 'C'
         expected = [('ticker', str, r'[A-Z]+', '+'),
                     ('alphabet', str, r'[A-Z][a-z]+')]
-        json_lws.find_schema_keys(schema, data_key) == expected
+        lws.find_schema_keys(schema, data_key) == expected
 
 class TestValidationHelpers:
     """Test the schema and data validation helpers."""
@@ -199,14 +199,14 @@ class TestValidationHelpers:
     def test_trim(self):
         """Test basic string trimming."""
         s1 = 'esrdctfvubfiqisqwduonq'
-        assert json_lws.trim(s1, 5) == 'esrdc...'
-        assert json_lws.trim(s1) == 'esrdctfvubfiqisqwduo...'
+        assert lws.trim(s1, 5) == 'esrdc...'
+        assert lws.trim(s1) == 'esrdctfvubfiqisqwduo...'
         s2 = 'asdasdasd'
-        assert json_lws.trim(s2) == 'asdasdasd'
+        assert lws.trim(s2) == 'asdasdasd'
 
     def test_node_to_str(self):
         """Test node unpacking for printing schema validation log."""
-        f = json_lws.node_to_str
+        f = lws.node_to_str
         # normal
         assert f(('a', 'b')) == 'a: b'
         # exception
@@ -215,7 +215,7 @@ class TestValidationHelpers:
 
     def test_walk(self):
         """Test dictionary walking."""
-        f = json_lws.walk
+        f = lws.walk
         d = {'a': {'b': 'c'}}
         assert f(d, []) == d
         assert f(d, ['a']) == {'b': 'c'}
@@ -223,7 +223,7 @@ class TestValidationHelpers:
 
     def test_update_stack(self):
         """Test stack updating."""
-        f = json_lws.update_stack
+        f = lws.update_stack
         s_path = [('a', str), ('b', str)]
         d_path = ['a', 'b']
         schema = {('a', str): {('b', str): {('c', str): {('d', str): 'e'}}}}

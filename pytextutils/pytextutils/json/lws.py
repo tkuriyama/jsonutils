@@ -12,7 +12,7 @@ import sys
 import re
 import json
 import pickle
-import json_logger
+import lws_logger
 
 ERRORS = {'key': hash('error key'),
           'key_str': '*** Key error',
@@ -215,8 +215,8 @@ def update_stack(fst_path, snd_path, fst, fst_key, snd_key):
 
 def gen_schema_output(log):
     """Call logger.dict_to_str() to generate output."""
-    root, base_tree = ('root', 'root'), [(('root', 'root'), 0)]
-    return json_logger.gen_log(log, root, base_tree, node_to_str, ERRORS)
+    root = ('root', 'root')
+    return lws_logger.gen_log(log, root, node_to_str, ERRORS)
 
 def validate_schema(schema, data):
     """Schema-centric validation.
@@ -260,8 +260,8 @@ def validate_schema(schema, data):
 
 def gen_data_output(log):
     """Call logger.dict_to_str() to generate output."""
-    root, base_tree = ('root', 'root'), [(('root', 'root'), 0)]
-    return json_logger.gen_log(log, root, base_tree, node_to_str, ERRORS)
+    root = ('root', 'root')
+    return lws_logger.gen_log(log, root, node_to_str, ERRORS)
 
 def validate_data(schema, data):
     """Data-centric validation.
@@ -329,7 +329,7 @@ def main(schema_path, data_path):
         schema_path: string of path to schema file
         data_path: string of path to data file
     Returns
-        string of validation report
+        Tuple (int of key erros, int of val errors, string of log output).
     """
 
     schema = load_schema(schema_path)
@@ -340,12 +340,12 @@ def main(schema_path, data_path):
     data_log = validate_data(schema, data)
     data_out = gen_data_output(data_log)
 
-    output = join_logs(schema_out, data_out)
-    return output
+    key_err, val_err, output = join_logs(schema_out, data_out)
+    return key_err, val_err, output
 
 if __name__ == '__main__':
     if len(sys.argv) == 3:
-        output = main(sys.argv[1], sys.argv[2])
+        _, _, output = main(sys.argv[1], sys.argv[2])
         print output
     else:
         print 'Call with two arguments, schema pickle and data filenames.\n'
