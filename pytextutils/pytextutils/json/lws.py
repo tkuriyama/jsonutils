@@ -329,23 +329,25 @@ def main(schema_path, data_path):
         schema_path: string of path to schema file
         data_path: string of path to data file
     Returns
-        Tuple (int of key erros, int of val errors, string of log output).
+        Tuple (int of schema key errors, int of schema val errors,
+               int of data key errors, in of data val erros,
+               string of log output).
     """
 
     schema = load_schema(schema_path)
     data = load_data(data_path)
 
     schema_log = validate_schema(schema, data)
-    schema_out = gen_schema_output(schema_log)
+    s_key_err, s_val_err, schema_out = gen_schema_output(schema_log)
     data_log = validate_data(schema, data)
-    data_out = gen_data_output(data_log)
+    d_key_err, d_val_err, data_out = gen_data_output(data_log)
 
-    key_err, val_err, output = join_logs(schema_out, data_out)
-    return key_err, val_err, output
+    output = join_logs(schema_out, data_out)
+    return s_key_err, s_val_err, d_key_err, d_val_err, output
 
 if __name__ == '__main__':
     if len(sys.argv) == 3:
-        _, _, output = main(sys.argv[1], sys.argv[2])
+        _, _, _, _, output = main(sys.argv[1], sys.argv[2])
         print output
     else:
         print 'Call with two arguments, schema pickle and data filenames.\n'
