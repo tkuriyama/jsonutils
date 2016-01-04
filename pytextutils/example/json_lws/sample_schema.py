@@ -1,4 +1,5 @@
-"""
+"""Sample schema generation file.
+Run to generate Python pickle file as schema for json_lws.
 """
 
 import sys
@@ -12,7 +13,7 @@ def ret_schema():
         ('dict of stocks', str, 'stocks'): {
             ('ticker', str, '[A-Z]*', '+'): {
                 ('stock price', str, 'price'): ('price', float),
-                ('company name', str): ('name', str)
+                ('company name', str, 'name'): ('name', str)
             }
         },
         ('magic number', str, 'magic_number'): ('number', int, 42)

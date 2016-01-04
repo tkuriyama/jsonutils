@@ -1,0 +1,11 @@
+{"path": "/apps/homefs1/tarokuriyama/stocks",
+ "stocks": {
+   "C": {
+     "price": 5.06,
+     "name": "Citigroup"
+   },
+   "BAC": {
+     "name": "Bank of America"
+   }
+ }
+}

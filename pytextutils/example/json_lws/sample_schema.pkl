@@ -55,9 +55,10 @@ tp26
 s(S'company name'
 p27
 g2
-tp28
-(S'name'
-p29
+S'name'
+p28
+tp29
+(g28
 g2
 tp30
 sss.
