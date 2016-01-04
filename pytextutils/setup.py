@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 setup(
     name = "Python Text Utilities",
     version = "0.1.3",
-    packages = find_packages('pytextutils'),
+    packages = find_packages('pytextutils.json'),
     scripts = [],
 
     install_requires = [],
