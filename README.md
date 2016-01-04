@@ -4,8 +4,6 @@ A set of experimental utilities for working with conventionally structured text 
 
 <hr>
 
-### Philosophy ###
-
 It is often useful to examine and validate structured text data. This library intends to provide a simple, customizable framework for running quick (but hopefully not so dirty) analysis.
 
 It should be possible to answer questions like:
@@ -19,9 +17,7 @@ The repo is organized by language; each language-specific repo has its own docum
 
 <hr>
 
-### Example ###
-
-**JSON Lightweight Schema (LWS)**
+**Example: JSON Lightweight Schema (LWS)**
 
 [JSON Schema](http://json-schema.org/) features some nice validation but it can be quite verbose and cumbersome to use.
 
