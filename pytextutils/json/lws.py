@@ -19,6 +19,12 @@ ERRORS = {'key': hash('error key'),
           'val': hash('error value'),
           'val_str': '*** Value error'}
 
+# Testing Helper
+
+def return_errors():
+    """Return error dict for testing purposes."""
+    return ERRORS
+
 # Type Validation
 
 def valid_text(val, rule):
