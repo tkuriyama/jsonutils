@@ -20,9 +20,9 @@ Some example schema value definitions, in which the data validation may be defin
 
 #### Validation Logic ####
 
-lws performs two types of validations by default (a "reconciliation"): schema-centric, and data-centric.
+lws performs two types of validations by default (a "reconciliation"): schema-centric and data-centric.
 
-If a data element is specified in the schema and is present in the data, both schema-centric and data-centric validations will return the same results. However, schema-centric validation captures schema keys that are not present in the data (insufficient data), and data-centric validation captures data keys that are not present in the schema (superfluous data).
+If a data element is specified in the schema and is present in the data, both schema-centric and data-centric validations will return the same results. However, schema-centric validation captures schema keys that are not present in the data (insufficient data), while data-centric validation captures data keys that are not present in the schema (superfluous data).
 
 <br>
 

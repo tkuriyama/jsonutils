@@ -152,6 +152,7 @@ def parse_schema_key(key):
     repeat = '' if len(key) <= 3 else key[3]
     return dtype, rule, repeat
 
+
 def valid_data_key(data_key, dtype, rule):
     """Verify key is text (string or unicode) and matches regex."""
     return (valid_text(data_key, rule) if classify(dtype) == 'text' else
