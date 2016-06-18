@@ -1,6 +1,6 @@
 """Test cases for JSON lws_logger module, assumes Pytest."""
 
-from pytextutils.json import lws_logger
+from jsonutils.lws import lws_logger
 
 
 class TestDictToTreeHelpers:

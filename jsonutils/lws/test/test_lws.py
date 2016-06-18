@@ -1,6 +1,6 @@
 """Test cases for JSON LWS module, assumes Pytest."""
 
-from pytextutils.json import lws
+from jsonutils.lws import lws
 
 
 class TestTypeValidation:
@@ -204,7 +204,7 @@ class TestValidationHelpers:
         """Test basic string trimming."""
         s1 = 'esrdctfvubfiqisqwduonq'
         assert lws.trim(s1, 5) == 'esrdc...'
-        assert lws.trim(s1) == 'esrdctfvubfiqisqwduo...'
+        assert lws.trim(s1, 20) == 'esrdctfvubfiqisqwduo...'
         s2 = 'asdasdasd'
         assert lws.trim(s2) == 'asdasdasd'
 
