@@ -2,6 +2,7 @@
 
 from pytextutils.json import lws_logger
 
+
 class TestDictToTreeHelpers:
     """Test the helper functions for dict_to_tree."""
 

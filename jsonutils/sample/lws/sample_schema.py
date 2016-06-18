@@ -5,6 +5,7 @@ Run to generate Python pickle file as schema for json_lws.
 import sys
 import pickle
 
+
 def ret_schema():
     """Defines dictionary of schema."""
 
@@ -20,6 +21,7 @@ def ret_schema():
     }
 
     return schema
+
 
 def main(filename):
     """Pickle schema."""

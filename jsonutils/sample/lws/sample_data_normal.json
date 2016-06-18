@@ -1,0 +1,13 @@
+{"path": "/apps/homefs1/tarokuriyama/stocks",
+ "stocks": {
+     "C": {
+	 "price": 5.06,
+	 "name": "Citigroup"
+     },
+     "BAC": {
+	 "price": 25.01,
+	 "name": "Bank of America"
+     }
+ },
+ "magic_number": 42
+}
