@@ -1,8 +1,6 @@
 
 [![Build Status](https://travis-ci.org/tkuriyama/jsonutils.svg?branch=master)](https://travis-ci.org/tkuriyama/jsonutils)
 
-## JSON Utilties in Python ##
-
 #### JSON Lightweight Schema (LWS) ####
 
 [JSON Schema](http://json-schema.org/) features some nice validation but it can be verbose and cumbersome to use.
