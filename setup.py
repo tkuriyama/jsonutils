@@ -1,16 +1,16 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 setup(
-    name = "pytextutils",
-    version = "0.1.3",
-    packages = ['pytextutils', 'pytextutils.json'],
-    scripts = [],
+    name="jsonutils",
+    version="0.1.5",
+    packages=['jsonutils', 'jsonutils.lws'],
+    scripts=[],
 
-    tests_require = ['pytest'],
-    install_requires = [],
-    package_data = {},
+    tests_require=['pytest'],
+    install_requires=[],
+    package_data={},
 
-    author = 'Taro Kuriyama',
-    author_email = 'taro@tarokuriyama.com',
-    description = "Python Text Utilities",
-    license = 'MIT'
+    author='Taro Kuriyama',
+    author_email='taro@tarokuriyama.com',
+    description="JSON Utilities in Python",
+    license='MIT'
 )

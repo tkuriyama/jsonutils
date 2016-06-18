@@ -1,8 +1,11 @@
 language: python
+
 python:
   - "2.7"
+
 # command to install dependencies
 install:
-  - pip install pytextutils/.
+  - pip install -e jsonutils/.
+
 # command to run tests
 script: py.test
