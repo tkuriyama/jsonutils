@@ -9,7 +9,7 @@ lws offers a lightweight schema definition and validation library in Python. Sch
 
 <hr>
 
-** Install **
+**Install**
 
 Directly from github
 

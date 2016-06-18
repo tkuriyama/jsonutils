@@ -6,20 +6,7 @@
 
 #### Introduction ####
 
-[JSON is defined](http://www.json.org/) as a series of nested {key: value} pairs, where a key is always a string and a value belongs to a set of possible data types. lws follows the same key-value structure, where a schema is defined by a dictionary in Python and serialized to file using [`pickle`](https://docs.python.org/2/library/pickle.html).
-
-A schema key consists of the following items:
-
-1. name, required
-2. data type, required
-3. data validation, optional
-4. repetition validation, optional
-
-A schema value consists of the following item:
-
-1. name, required
-2. data type, required
-3. data validation, optional
+[JSON is defined](http://www.json.org/) as a series of nested {key: value} pairs, where a key is always a string and a value belongs to a set of possible data types. lws follows the same key-value structure, where a schema is defined by a dictionary in Python and serialized to file using [`pickle`](https://docs.python.org/2/library/pickle.html). The schema pickle file can then be used to validate JSON files.
 
 Some example schema value definitions, in which the data validation may be defined in various ways -- in this case, as a fixed integer, as a predicate function `is_prime` that must be satisfied, and as an anonymous function.
 
@@ -35,6 +22,7 @@ lws performs two types of validations by default (so "reconciliation" is maybe a
 
 If a data element is specified in the schema and is present in the data, both schema-centric and data-centric validations will return the same results. However, schema-centric validation captures schema keys that are not present in the data (insufficient data), and data-centric validation captures data keys that are not present in the schema (superfluous data).
 
+<br>
 
 #### Schema Definition ####
 
@@ -47,6 +35,8 @@ A schema key is defined as a tuple containing between two and four elements.
 | 2 | Data Validation       | N | specifies validation for the key |
 | 3 | Repetition Validation | N | specifies if the key is repeated |
 
+<br>
+
 A schema value is defined as a tuple containing between two and three elements.
 
 | Index | Element | Required | Description |  
@@ -54,6 +44,8 @@ A schema value is defined as a tuple containing between two and three elements.
 | 0 | Name                  | Y | name of schema key        |
 | 1 | Data Type             | Y | Python data type          |
 | 2 | Data Validation       | N | specifies validation for the key |
+
+<br>
 
 Permissible schema data types and mapping to JSON data types:
 
@@ -66,6 +58,8 @@ Permissible schema data types and mapping to JSON data types:
 | bool         | true, false|
 | None         | null       |
 
+<br>
+
 For data validation, lws will perform an equality check (== operator) if a value is supplied. Alternatively, the following data validation objects may be supplied:
 
 | JSON Dtype | Permissible Validation Object |
@@ -73,6 +67,8 @@ For data validation, lws will perform an equality check (== operator) if a value
 | text       | function, regex |
 | number     | function |
 | array      | function |
+
+<br>
 
 A single character is expected for the repetition validation option. The definition follows that of regular expressions:
 
@@ -82,6 +78,7 @@ A single character is expected for the repetition validation option. The definit
 | + | one or more repetitions |
 | ? | zero or one repetitions |
 
+<br>
 
 #### Usage and Example ####
 
