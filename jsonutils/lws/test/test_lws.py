@@ -139,7 +139,7 @@ class TestValidateValues:
         assert f(schema_val, 2) is True
         assert f(schema_val, 257) is False
 
-        
+
 class TestValidateKeys:
     """Test functions that validate keys."""
 
@@ -172,8 +172,10 @@ class TestValidateKeys:
         f = lws.valid_length
         assert f('', [1]) is True
         assert f('+', [1, 1]) is True
+        assert f('+', []) is False
         assert f('?', []) is True
         assert f('?', [1]) is True
+        assert f('?', [1, 1]) is False
         assert f('?', [1, 1, 1]) is False
         assert f('*', []) is True
         assert f('*', [1, 1, 1]) is True
