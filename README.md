@@ -9,4 +9,4 @@
 
 JSON LWS offers a lightweight schema definition and validation in Python. Schemas are defined as Python dictionaries and serialized to pickle files for use in validation.
 
-> [Documentation](http://https://github.com/tkuriyama/jsonutils/blob/master/docs/json_lws.rst)
+> [Documentation](https://github.com/tkuriyama/jsonutils/blob/master/docs/json_lws.rst)
