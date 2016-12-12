@@ -26,7 +26,19 @@ def max_depth(d):
     return (0 if not isinstance(d, dict) else
             1 + max(max_depth(v) for v in d.itervalues()))
 
-# Functions
+def make_pair(key, val):
+    """Return key, val pair as single string appropriate for printing."""
+    key_str = str(key)
+    if len(key_str) > 20:
+        key_str = key_str[:20] + '...'
+
+    val_str = str(val)
+    if len(val_str) > 50:
+        val_str = val_str[:50] + '...'
+
+    return key_str + ' -> ' + val_str
+
+# Inspection Functions
 
 def describe(data, quiet):
     """Describe structure of data."""
@@ -42,22 +54,28 @@ def describe(data, quiet):
     
     return True
 
-def sample(data):
-    """"""
-    
-    return
+def sample(data, n, quiet):
+    """Saple first n (key, value) pairs of file."""
+    keys = sorted(data.keys())[:n]
+    if not quiet:
+        print '\n> Print first {:,d} keys of file'.format(n)
+    else:
+        print ''
+
+    pairs = [make_pair(key, data[key]) for key in keys]
+    print '\n'.join(pairs)
+    return True
 
 def chars(data, n, quiet):
     """Print first n chars of file."""
     data_str = json.dumps(data, indent=2, sort_keys=True)
     if not quiet:
         print '\n> Show first {:,d} chars of file'.format(n)
+    else:
+        print ''
+        
     print data_str[:n]
     return True
-
-def keys(data):
-    """"""
-    return
 
 def find(data, key):
     """"""
@@ -81,17 +99,15 @@ def main(args):
     if args.describe:
         describe(data, args.quiet)
     if args.sample:
-        sample(data)
+        sample(data, args.sample, args.quiet)
     if args.chars:
         chars(data, args.chars, args.quiet)
-    if args.keys:
-        keys(data)
     if args.find:
         find(data)
 
     print '\n'
 
-    other_args = [args.describe, args.sample, args.chars, args.keys, args.find]
+    other_args = [args.describe, args.sample, args.chars, args.find]
     if args.less or not any(other_args):
         data_str = json.dumps(data, indent=2, sort_keys=True)
         less(data_str)
