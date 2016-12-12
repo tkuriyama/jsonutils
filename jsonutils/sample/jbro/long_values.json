@@ -1,0 +1,3 @@
+{"a relatively long key": "a relatively long value",
+ "another relatively long key": {"long key 1": "lorem ipsem dolor sit amet...",
+                                 "long key 2": "lorem ipsem dolor sit amet..."}}
