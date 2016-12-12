@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+
+from jsonutils.jbro import jbro
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='JSON browsing utility')
+    parser.add_argument('filename', help='filename of JSON file')
+
+    parser.add_argument('-q', '--quiet', action='store_true',
+                        help='suppress output description')
+    parser.add_argument('-c', '--chars', type=int,
+                        help='sample n chars from file')
+    parser.add_argument('-d', '--describe', action='store_true',
+                        help='describe structure of JSON file')
+    parser.add_argument('-f', '--find',
+                        help='find given key\'s value; nest in form key1.key2')
+    parser.add_argument('-k', '--keys',
+                        help='')
+    parser.add_argument('-l', '--less', action='store_true',
+                        help='pipe pretty print of JSON to less')
+    parser.add_argument('-s', '--sample', type=int,
+                        help='sample n keys from file')
+    
+    args = parser.parse_args()
+    jbro.main(args)
