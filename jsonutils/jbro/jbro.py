@@ -3,7 +3,6 @@
 
 from subprocess import Popen, PIPE
 import json
-import argparse
 
 # Helpers
 
@@ -33,6 +32,8 @@ def describe(data, quiet):
     """Describe structure of data."""
     if not quiet:
         print '\n> Describe structure of file'
+    else:
+        print ''
         
     print 'Top-level keys: {:,d}'.format(len(data))
     print 'Total keys: {:,d}'.format(count_keys(data))
@@ -70,10 +71,10 @@ def less(data_str):
     p.wait()
     return True
 
-# Main / Argparse
+# Main 
 
 def main(args):
-    """"""
+    """Process args from argparse."""
     data = test_json(args.filename)
     if not data: return False
 
