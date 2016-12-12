@@ -3,7 +3,7 @@ setup(
     name="jsonutils",
     version="0.1.6",
     packages=['jsonutils', 'jsonutils.lws', 'jsonutils.jbro'],
-    scripts=['jbro/bin/jbro'],
+    scripts=['jsonutils/bin/jbro'],
 
     tests_require=['pytest'],
     install_requires=[],

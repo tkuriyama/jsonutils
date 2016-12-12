@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 from jsonutils.jbro import jbro
 
 if __name__ == '__main__':
