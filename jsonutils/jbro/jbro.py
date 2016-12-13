@@ -19,24 +19,31 @@ def test_json(filename):
 def count_keys(d):
     """Count number of keys in given dict."""
     return (0 if not isinstance(d, dict) else
-            len(d) + sum(count_keys(v) for v in d.itervalues()))
+            len(d) + sum(count_keys(v) for v in d.values()))
 
 def max_depth(d):
     """Return maximum depth of given dict."""
     return (0 if not isinstance(d, dict) else
-            1 + max(max_depth(v) for v in d.itervalues()))
+            1 + max(max_depth(v) for v in d.values()))
 
+def truncate(val, n, ellipsis='...'):
+    """Truncate value at n chars."""
+    val_str = str(val)
+    return (val_str[:n] + ellipsis if len(val_str) > n else
+            val_str)
+    
 def make_pair(key, val):
     """Return key, val pair as single string appropriate for printing."""
-    key_str = str(key)
-    if len(key_str) > 20:
-        key_str = key_str[:20] + '...'
+    return ' -> '.join([truncate(key, 20), truncate(val, 50)])
 
-    val_str = str(val)
-    if len(val_str) > 50:
-        val_str = val_str[:50] + '...'
-
-    return key_str + ' -> ' + val_str
+def find_key(d, key_str):
+    """Attempt to find key in dict, where key may be nested key1.key2..."""
+    keys = key_str.split('.')
+    key = keys[0]
+    return (d[key] if len(keys) == 1 and key in d else
+            None if len(keys) == 1 and key not in d else
+            find_key(d[key], '.'.join(keys[1:])) if key in d else
+            None)
 
 # Inspection Functions
 
@@ -55,31 +62,55 @@ def describe(data, quiet):
     return True
 
 def sample(data, n, quiet):
-    """Saple first n (key, value) pairs of file."""
-    keys = sorted(data.keys())[:n]
+    """Sample first n (key, value) pairs of file."""
     if not quiet:
         print '\n> Print first {:,d} keys of file'.format(n)
     else:
         print ''
-
+        
+    keys = sorted(data.keys())[:n]
     pairs = [make_pair(key, data[key]) for key in keys]
     print '\n'.join(pairs)
     return True
 
 def chars(data, n, quiet):
     """Print first n chars of file."""
-    data_str = json.dumps(data, indent=2, sort_keys=True)
     if not quiet:
         print '\n> Show first {:,d} chars of file'.format(n)
     else:
         print ''
         
+    data_str = json.dumps(data, indent=2, sort_keys=True)
     print data_str[:n]
     return True
 
-def find(data, key):
-    """"""
-    return
+def find(data, key, quiet):
+    """Attempt to find key in dict, where key nesting in form key1.key2..."""
+    if not quiet:
+        print '\n> Find key {} in data'.format(key)
+    else:
+        print ''
+        
+    val = find_key(data, key)
+    if val is not None:
+        print ' -> '.join([truncate(key, 20), truncate(val, 50)])
+    else:
+        print 'Key not found.'
+    return True
+
+def find_rec(data, key, quiet):
+    """Find key recursively in data, return all occurences."""
+    if not quiet:
+        print '\n> Find key {} recursively in data'.format(key)
+    else:
+        print ''
+
+    vals = find_key_rec(data, key)
+    if vals is not []:
+        pass
+    else:
+        print 'Key not found.'
+    return True
 
 def less(data_str):
     """Pretty print JSON and pipe to less."""
@@ -103,7 +134,9 @@ def main(args):
     if args.chars:
         chars(data, args.chars, args.quiet)
     if args.find:
-        find(data)
+        find(data, args.find, args.quiet)
+    if args.find-recursive:
+        find_rec(data, args.find-recursive, args.quiet)
 
     print '\n'
 

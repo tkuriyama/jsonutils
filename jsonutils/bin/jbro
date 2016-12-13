@@ -11,15 +11,17 @@ if __name__ == '__main__':
                         help='suppress output description')
 
     parser.add_argument('-d', '--describe', action='store_true',
-                        help='describe structure of JSON file')
+                        help='describe structure of file')
     parser.add_argument('-s', '--sample', type=int, 
                         help='sample n (key, value) pairs from file')
     parser.add_argument('-c', '--chars', type=int, 
                         help='sample n chars from file')
     parser.add_argument('-f', '--find',
-                        help='find given key\'s value; nest in form key1.key2')
+                        help='find given key, nesting in form key1.key2')
+    parser.add_argument('-F', '--find-recursive',
+                        help='find given key recursively (i.e. all occurrences)')
     parser.add_argument('-l', '--less', action='store_true',
-                        help='pipe pretty print of JSON to less')
+                        help='pipe pretty print of file to less')
 
     args = parser.parse_args()
     jbro.main(args)
