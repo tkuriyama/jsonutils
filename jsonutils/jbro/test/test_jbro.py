@@ -58,4 +58,18 @@ class TestHelpers:
         assert f(d3, 'e') is None
         assert f(d3, 'a.d') is None
 
+    def test_find_key_rec(self):
+        """Find key recursively in dict."""
+        f = jbro.find_key_rec
+
+        d0 = {}
+        d1 = {'a': 'b'}
+        d2 = {'a': 'b',
+              'c': 'd',
+              'e': {'a': 'f'}}
+
+        assert f(d0, 'a') == []
+        assert f(d1, 'a') == [(0, 'b')]
+        assert f(d2, 'a') == [(0, 'b'), (1, 'f')]
+
     
