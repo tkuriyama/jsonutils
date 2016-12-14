@@ -18,7 +18,7 @@ if __name__ == '__main__':
                         help='sample n chars from file')
     parser.add_argument('-f', '--find',
                         help='find given key, nesting in form key1.key2')
-    parser.add_argument('-F', '--find-recursive',
+    parser.add_argument('-F', '--find_recursive',
                         help='find given key recursively (i.e. all occurrences)')
     parser.add_argument('-l', '--less', action='store_true',
                         help='pipe pretty print of file to less')

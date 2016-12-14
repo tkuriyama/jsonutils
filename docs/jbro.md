@@ -27,7 +27,7 @@ optional arguments:
   -c CHARS, --chars CHARS
                         sample n chars from file
   -f FIND, --find FIND  find given key's value(s) in file
-  -F FIND_RECURSIVE, --find-recursive FIND_RECURSIVE
+  -F FIND_RECURSIVE, --find_recursive FIND_RECURSIVE
                         find given key recursively (i.e. all occurrences)
   -l, --less            pipe pretty print of file to less
 ```
