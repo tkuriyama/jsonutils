@@ -5,6 +5,8 @@
 
 #### Introduction ####
 
+jbro offers a simple command-line tool for inspecting the contents of JSON files. It is especially useful when a JSON file is not formatted nicely, e.g. without pretty-print spacing or worse, without any newline characters. 
+
 <hr>
 
 #### Usage ####
@@ -73,7 +75,7 @@ The quiet (-q) flag removes additional descriptions in the output. This makes pi
 $ jbro sample.json -s 100 | less
 ```
 
-Find (-f) attempts to return a single value given either a key or a nested key in form key1.key2... Recursive find (-F) attempts to find all values associated with a given key at any level of nesting. Although JSON technically has no restriction against duplicate keys at the same level of nesting, jbro makes such a uniqueness assumption (by virtue of using Python dicts).
+Find (-f) attempts to return a single value given either a key or a nested key in form key1.key2... Recursive find (-F) attempts to find all values associated with a given key at any level of nesting. Although JSON technically has no restriction against duplicate keys at the same level of nesting, it is sensible practice and jbro makes such a uniqueness assumption (by virtue of using Python dicts).
 
 ```python
 find1 = {'a': 1,

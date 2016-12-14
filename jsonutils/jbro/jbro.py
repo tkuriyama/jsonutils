@@ -36,6 +36,8 @@ def make_pair(key, val):
     """Return key, val pair as single string appropriate for printing."""
     return ' -> '.join([truncate(key, 20), truncate(val, 50)])
 
+# Search Functions
+
 def find_key(d, nested_key):
     """Attempt to find key in dict, where key may be nested key1.key2..."""
     keys = nested_key.split('.')
