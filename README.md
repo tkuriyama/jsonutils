@@ -7,6 +7,13 @@ lws offers a lightweight schema definition and validation library in Python. Sch
 
 > [Documentation](https://github.com/tkuriyama/jsonutils/blob/master/docs/json_lws.md)
 
+#### JSON Browser (jbro) ####
+
+jbro offers a simple command-line tool for inspecting the contents of JSON files.
+
+> [Documentation](https://github.com/tkuriyama/jsonutils/blob/master/docs/jbro.md)
+
+
 <hr>
 
 **Install**
