@@ -5,7 +5,7 @@
 
 #### Introduction ####
 
-jbro offers a simple command-line tool for inspecting the contents of JSON files. It is especially useful when a JSON file is not formatted nicely, e.g. without pretty-print spacing or worse, without any newline characters. 
+jbro offers a simple command-line tool for inspecting the contents of JSON files. It is motivated by the frustration of calling `head` on a very long JSON file without any newline characters. It is especially useful for dealing with JSON files that are not formatted nicely, e.g. without reasonable spacing or newline characters.
 
 <hr>
 
