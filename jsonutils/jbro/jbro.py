@@ -23,7 +23,7 @@ def count_keys(d):
 
 def max_depth(d):
     """Return maximum depth of given dict."""
-    return (0 if not isinstance(d, dict) else
+    return (0 if not isinstance(d, dict) or len(d) == 0 else
             1 + max(max_depth(v) for v in d.values()))
 
 def truncate(val, n, ellipsis='...'):
@@ -44,6 +44,12 @@ def find_key(d, key_str):
             None if len(keys) == 1 and key not in d else
             find_key(d[key], '.'.join(keys[1:])) if key in d else
             None)
+
+def find_key_rec(d, key):
+    """"""
+    hits = []
+    
+    return
 
 # Inspection Functions
 
@@ -135,7 +141,7 @@ def main(args):
         chars(data, args.chars, args.quiet)
     if args.find:
         find(data, args.find, args.quiet)
-    if args.find-recursive:
+    if args.find_recursive:
         find_rec(data, args.find-recursive, args.quiet)
 
     print '\n'
