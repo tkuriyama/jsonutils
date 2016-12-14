@@ -36,20 +36,32 @@ def make_pair(key, val):
     """Return key, val pair as single string appropriate for printing."""
     return ' -> '.join([truncate(key, 20), truncate(val, 50)])
 
-def find_key(d, key_str):
+def find_key(d, nested_key):
     """Attempt to find key in dict, where key may be nested key1.key2..."""
-    keys = key_str.split('.')
+    keys = nested_key.split('.')
     key = keys[0]
+    
     return (d[key] if len(keys) == 1 and key in d else
             None if len(keys) == 1 and key not in d else
+            None if not isinstance(d[key], dict) else
             find_key(d[key], '.'.join(keys[1:])) if key in d else
             None)
 
-def find_key_rec(d, key):
-    """"""
+def find_key_rec(search_d, search_key):
+    """Find search_key recursively (DFS) in dict, return value and level."""
     hits = []
+    dicts = [(0, search_d)]
     
-    return
+    while dicts:
+        level, d = dicts.pop()
+        for key in d:
+            if key == search_key:
+                hits.append((level, d[key]))
+            else:
+                if isinstance(d[key], dict):
+                    dicts.append((level + 1, d[key]))
+    
+    return hits
 
 # Inspection Functions
 
@@ -113,7 +125,8 @@ def find_rec(data, key, quiet):
 
     vals = find_key_rec(data, key)
     if vals is not []:
-        pass
+        found = ['Level {:,d} -> {}'.format(level, val) for level, val in vals]
+        print '\n'.join(found)
     else:
         print 'Key not found.'
     return True
@@ -142,11 +155,12 @@ def main(args):
     if args.find:
         find(data, args.find, args.quiet)
     if args.find_recursive:
-        find_rec(data, args.find-recursive, args.quiet)
+        find_rec(data, args.find_recursive, args.quiet)
 
     print '\n'
 
-    other_args = [args.describe, args.sample, args.chars, args.find]
+    other_args = [args.describe, args.sample, args.chars, args.find,
+                  args.find_recursive]
     if args.less or not any(other_args):
         data_str = json.dumps(data, indent=2, sort_keys=True)
         less(data_str)
