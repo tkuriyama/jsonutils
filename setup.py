@@ -1,7 +1,7 @@
 from setuptools import setup
 setup(
     name="jsonutils",
-    version="0.3.0",
+    version="0.3.1",
     packages=['jsonutils', 'jsonutils.lws', 'jsonutils.jbro'],
     scripts=['jsonutils/bin/jbro'],
 
