@@ -33,11 +33,21 @@ def trim(val, n, ellipsis='...'):
     return (val_str[:trim_len] + ellipsis if len(val_str) > n else
             val_str)
 
-def join_pair(key, val, truncate, sep='\t', left=20):
-    """Return key, val pair as single string appropriate for printing."""
-    right = 80 - max(left, len(key)) - len(sep)
-    return (sep.join([trim(key, left), trim(val, right)]) if truncate else
-            sep.join([str(key), str(val)]))
+def join_pair(v1, v2, truncate, sep='\t', left=20, max_len=80):
+    """Format (v1, v2) pair as single string appropriate for printing.
+    Args
+        v1: obj passable to str(), first value
+        v2: obj passable to str(), second value
+        truncate: bool, trim total length based on left and max_len if true
+        sep: str, separator between pair
+        left: int, maximum length of left side of pair (v1)
+        max_len: int, maximum length of string
+    Returns
+        String of joined pair.
+    """
+    right = max_len - max(left, len(v1)) - len(sep)
+    return (sep.join([trim(v1, left), trim(v2, right)]) if truncate else
+            sep.join([str(v1), str(v2)]))
 
 # Search Functions
 
@@ -67,6 +77,12 @@ def find_key_rec(search_d, search_key):
                     dicts.append((level + 1, d[key]))
 
     return hits
+
+def get_all_keys(d):
+    """Retrieve all keys in dictionary recursively in format key1.key2..."""
+
+
+    return keys
 
 # Inspection Functions
 
@@ -148,7 +164,7 @@ def get_keys(data, recursive, quiet, truncate):
     else:
         print ''
 
-    keys = find_all_keys(data) if recursive else sorted(data.keys())
+    keys = get_all_keys(data) if recursive else sorted(data.keys())
     if keys is not []:
         if truncate:
             print '\n'.join([trim(key, 80) for key in keys])
