@@ -144,6 +144,8 @@ def find(data, key, quiet, truncate):
     if val is not None:
         if truncate:
             print trim(val, 80)
+        elif isinstance(val, dict):
+            print json.dumps(val, indent=2, sort_keys=True)
         else:
             print val
     else:
