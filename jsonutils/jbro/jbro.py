@@ -29,7 +29,7 @@ def max_depth(d):
 def trim(val, n, ellipsis='...'):
     """Trim value to max of n chars."""
     val_str = str(val)
-    trim_len = n - len(ellipsis)
+    trim_len = max(n - len(ellipsis), 0)
     return (val_str[:trim_len] + ellipsis if len(val_str) > n else
             val_str)
 
@@ -45,7 +45,7 @@ def join_pair(v1, v2, truncate, sep='\t', left=20, max_len=80):
     Returns
         String of joined pair.
     """
-    right = max_len - max(left, len(v1)) - len(sep)
+    right = max_len - min(left, len(v1)) - len(sep)
     return (sep.join([trim(v1, left), trim(v2, right)]) if truncate else
             sep.join([str(v1), str(v2)]))
 
