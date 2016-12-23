@@ -57,7 +57,7 @@ Total keys     6
 Max depth      5
 Total chars    46
 
-> Print first 5 keys of file
+> Sample first 5 (key, value) pairs from file
 1	{u'2': {u'3': {u'4': {u'5': 0}}}}
 a	b
 ```
