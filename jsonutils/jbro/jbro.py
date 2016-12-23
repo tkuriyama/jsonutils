@@ -27,14 +27,16 @@ def max_depth(d):
             1 + max(max_depth(v) for v in d.values()))
 
 def trim(val, n, ellipsis='...'):
-    """Trim value at n chars."""
+    """Trim value to max of n chars."""
     val_str = str(val)
-    return (val_str[:n] + ellipsis if len(val_str) > n else
+    trim_len = n - len(ellipsis)
+    return (val_str[:trim_len] + ellipsis if len(val_str) > n else
             val_str)
 
-def join_pair(key, val, truncate, sep='\t'):
+def join_pair(key, val, truncate, sep='\t', left=20):
     """Return key, val pair as single string appropriate for printing."""
-    return (sep.join([trim(key, 20), trim(val, 50)]) if truncate else
+    right = 80 - max(left, len(key)) - len(sep)
+    return (sep.join([trim(key, left), trim(val, right)]) if truncate else
             sep.join([str(key), str(val)]))
 
 # Search Functions
@@ -132,12 +134,8 @@ def find_rec(data, key, quiet, truncate):
 
     vals = find_key_rec(data, key)
     if vals is not []:
-        if truncate:
-            found = ['Level {:,d}\t {}'.format(lvl, trim(val, 60))
-                     for lvl, val in vals]
-        else:
-            found = ['Level {:,d}\t {}'.format(lvl, val)
-                     for lvl, val in vals]
+        found = [join_pair('Level {:,d}'.format(lvl), val, truncate)
+                 for lvl, val in vals]
         print '\n'.join(found)
     else:
         print 'Key not found.'
