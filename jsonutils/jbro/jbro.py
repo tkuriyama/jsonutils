@@ -63,7 +63,7 @@ def find_key(d, nested_key):
             None)
 
 def find_key_rec(search_d, search_key):
-    """Find search_key recursively (DFS) in dict, return value and level."""
+    """Attempt to find all search_key (BFS) in dict, return value and level."""
     hits = []
     dicts = [(0, search_d)]
 
@@ -78,9 +78,18 @@ def find_key_rec(search_d, search_key):
 
     return hits
 
-def get_all_keys(d):
-    """Retrieve all keys in dictionary recursively in format key1.key2..."""
+def get_all_keys(search_d):
+    """Retrieve all keys in dict (BFS) in format key1.key2..."""
+    keys = []
+    dicts = [('', search_d)]
 
+    while dicts:
+        parent, d = dicts.pop()
+        for key in sorted(d.keys()):
+            full_key = key if parent == '' else '.'.join([parent, key])
+            keys.append(full_key)
+            if isinstance(d[key], dict):
+                dicts.append((full_key, d[key]))
 
     return keys
 
@@ -160,7 +169,10 @@ def find_rec(data, key, quiet, truncate):
 def get_keys(data, recursive, quiet, truncate):
     """List all top-level keys in data."""
     if not quiet:
-        print '\n> List top-level keys in data.'
+        if recursive:
+            print '\n> List all keys in data.'
+        else:
+            print '\n> List top-level keys in data.'
     else:
         print ''
 
@@ -203,7 +215,7 @@ def main(args):
         get_keys(data, False, args.quiet, args.truncate)
     if args.keys_recursive:
         get_keys(data, True, args.quiet, args.truncate)
-        
+
     print '\n'
 
     other_args = [args.describe, args.sample, args.chars, args.find,

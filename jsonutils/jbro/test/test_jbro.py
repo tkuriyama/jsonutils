@@ -30,11 +30,11 @@ class TestHelpers:
         assert f(d6) == 6
         assert f(d0) == 0
         assert f(d1) == 1
-        
+
     def test_trim(self):
         """String trimming."""
         f = jbro.trim
-        
+
         string = '0123456789abcdefg'
         assert f(string, 10) == '0123456...'
         assert f(string, 3) == '...'
@@ -50,11 +50,11 @@ class TestHelpers:
         assert f(v1, v2, False, sep) == 'value1->value2'
         assert f(v1, v2, True, sep, 5) == 'va...->value2'
         assert f(v1, v2, True, sep, 5, 12) == 'va...->va...'
-        
+
     def test_find_key(self):
         """Find key or nested keys in dict, return val."""
         f = jbro.find_key
-        
+
         d1 = {'a': 'b'}
         d2 = {'a': 'b',
               'c': 'd',
@@ -82,4 +82,16 @@ class TestHelpers:
         assert f(d1, 'a') == [(0, 'b')]
         assert f(d2, 'a') == [(0, 'b'), (1, 'f')]
 
-    
+    def test_get_all_keys(self):
+        """Retrieve all keys in dict"""
+        f = jbro.get_all_keys
+
+        d1 = {'a': '',
+              'b': '',
+              'c': ''}
+        d2 = {'a': 'b',
+              'c': 'd',
+              'e': {'a': 'f'}}
+
+        assert set(f(d1)) == set(['a', 'b', 'c'])
+        assert set(f(d2)) == set(['a', 'c', 'e', 'e.a'])
