@@ -31,15 +31,25 @@ class TestHelpers:
         assert f(d0) == 0
         assert f(d1) == 1
         
-    def test_truncate(self):
-        """String truncation."""
-        f = jbro.truncate
+    def test_trim(self):
+        """String trimming."""
+        f = jbro.trim
         
         string = '0123456789abcdefg'
-        assert f(string, 10) == '0123456789...'
-        assert f(string, 0) == '...'
+        assert f(string, 10) == '0123456...'
+        assert f(string, 3) == '...'
         assert f(string, 0, '') == ''
         assert f(string, 100) == string
+
+    def test_join_pair(self):
+        """Joining pair to string."""
+        f = jbro.join_pair
+
+        v1, v2 = 'value1', 'value2'
+        sep = '->'
+        assert f(v1, v2, False, sep) == 'value1->value2'
+        assert f(v1, v2, True, sep, 5) == 'va...->value2'
+        assert f(v1, v2, True, sep, 5, 12) == 'va...->va...'
         
     def test_find_key(self):
         """Find key or nested keys in dict, return val."""
