@@ -31,7 +31,7 @@ def truncate(val, n, ellipsis='...'):
     val_str = str(val)
     return (val_str[:n] + ellipsis if len(val_str) > n else
             val_str)
-    
+
 def make_pair(key, val):
     """Return key, val pair as single string appropriate for printing."""
     return ' -> '.join([truncate(key, 20), truncate(val, 50)])
@@ -42,7 +42,7 @@ def find_key(d, nested_key):
     """Attempt to find key in dict, where key may be nested key1.key2..."""
     keys = nested_key.split('.')
     key = keys[0]
-    
+
     return (d[key] if len(keys) == 1 and key in d else
             None if len(keys) == 1 and key not in d else
             None if not isinstance(d[key], dict) else
@@ -53,7 +53,7 @@ def find_key_rec(search_d, search_key):
     """Find search_key recursively (DFS) in dict, return value and level."""
     hits = []
     dicts = [(0, search_d)]
-    
+
     while dicts:
         level, d = dicts.pop()
         for key in d:
@@ -62,7 +62,7 @@ def find_key_rec(search_d, search_key):
             else:
                 if isinstance(d[key], dict):
                     dicts.append((level + 1, d[key]))
-    
+
     return hits
 
 # Inspection Functions
@@ -73,12 +73,12 @@ def describe(data, quiet):
         print '\n> Describe structure of file'
     else:
         print ''
-        
-    print 'Top-level keys: {:,d}'.format(len(data))
-    print 'Total keys: {:,d}'.format(count_keys(data))
-    print 'Max depth: {:,d}'.format(max_depth(data))
-    print 'Total chars: {:,d}'.format(len(json.dumps(data)))
-    
+
+    print 'Top-level keys {:,d}'.format(len(data))
+    print 'Total keys     {:,d}'.format(count_keys(data))
+    print 'Max depth      {:,d}'.format(max_depth(data))
+    print 'Total chars    {:,d}'.format(len(json.dumps(data)))
+
     return True
 
 def sample(data, n, quiet):
@@ -87,7 +87,7 @@ def sample(data, n, quiet):
         print '\n> Print first {:,d} keys of file'.format(n)
     else:
         print ''
-        
+
     keys = sorted(data.keys())[:n]
     pairs = [make_pair(key, data[key]) for key in keys]
     print '\n'.join(pairs)
@@ -99,26 +99,30 @@ def chars(data, n, quiet):
         print '\n> Show first {:,d} chars of file'.format(n)
     else:
         print ''
-        
+
     data_str = json.dumps(data, indent=2, sort_keys=True)
     print data_str[:n]
     return True
 
-def find(data, key, quiet):
+def find(data, key, quiet, truncate):
     """Attempt to find key in dict, where key nesting in form key1.key2..."""
     if not quiet:
         print '\n> Find key {} in data'.format(key)
     else:
         print ''
-        
+
     val = find_key(data, key)
+
     if val is not None:
-        print ' -> '.join([truncate(key, 20), truncate(val, 50)])
+        if truncate:
+            print truncate(val, 80)
+        else:
+            print val
     else:
         print 'Key not found.'
     return True
 
-def find_rec(data, key, quiet):
+def find_rec(data, key, quiet, truncate):
     """Find key recursively in data, return all occurences."""
     if not quiet:
         print '\n> Find key {} recursively in data'.format(key)
@@ -127,11 +131,23 @@ def find_rec(data, key, quiet):
 
     vals = find_key_rec(data, key)
     if vals is not []:
-        found = ['Level {:,d} -> {}'.format(level, val) for level, val in vals]
+        if truncate:
+            found = ['Level {:,d}\t {}'.format(lvl, truncate(val, 60))
+                     for lvl, val in vals]
+        else:
+            found = ['Level {:,d}\t {}'.format(lvl, val) for lvl, val in vals]
         print '\n'.join(found)
     else:
         print 'Key not found.'
     return True
+
+def keys(data, quiet, truncate):
+    """"""
+    return
+
+def keys_rec(data, quiet, truncate):
+    """"""
+    return
 
 def less(data_str):
     """Pretty print JSON and pipe to less."""
@@ -141,7 +157,7 @@ def less(data_str):
     p.wait()
     return True
 
-# Main 
+# Main
 
 def main(args):
     """Process args from argparse."""
@@ -151,18 +167,22 @@ def main(args):
     if args.describe:
         describe(data, args.quiet)
     if args.sample:
-        sample(data, args.sample, args.quiet)
+        sample(data, args.sample, args.quiet, args.truncate)
     if args.chars:
         chars(data, args.chars, args.quiet)
     if args.find:
-        find(data, args.find, args.quiet)
+        find(data, args.find, args.quiet, args.truncate)
     if args.find_recursive:
-        find_rec(data, args.find_recursive, args.quiet)
-
+        find_rec(data, args.find_recursive, args.quiet, args.truncate)
+    if args.keys:
+        keys(data, args.quiet, args.truncate)
+    if args.keys_recursive:
+        keys_rec(data, args.quiet, args.truncate)
+        
     print '\n'
 
     other_args = [args.describe, args.sample, args.chars, args.find,
-                  args.find_recursive]
+                  args.find_recursive, args.keys, args.keys_recursive]
     if args.less or not any(other_args):
         data_str = json.dumps(data, indent=2, sort_keys=True)
         less(data_str)
