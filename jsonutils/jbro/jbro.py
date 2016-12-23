@@ -112,7 +112,7 @@ def describe(data, quiet):
 def sample(data, n, quiet, truncate):
     """Sample first n (key, value) pairs of file."""
     if not quiet:
-        print '\n> Print first {:,d} keys of file'.format(n)
+        print '\n> Sample first {:,d} (key, value) pairs from file'.format(n)
     else:
         print ''
 

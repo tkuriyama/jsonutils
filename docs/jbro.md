@@ -106,3 +106,5 @@ Level 0 1
 Level 1 3
 ```
 
+The key listing (-k, -K) functions are intended to be used with less, grep, etc, where it is desirable to isolate keys in files.
+
