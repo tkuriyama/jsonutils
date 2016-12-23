@@ -26,15 +26,16 @@ def max_depth(d):
     return (0 if not isinstance(d, dict) or len(d) == 0 else
             1 + max(max_depth(v) for v in d.values()))
 
-def truncate(val, n, ellipsis='...'):
-    """Truncate value at n chars."""
+def trim(val, n, ellipsis='...'):
+    """Trim value at n chars."""
     val_str = str(val)
     return (val_str[:n] + ellipsis if len(val_str) > n else
             val_str)
 
-def make_pair(key, val):
+def join_pair(key, val, truncate, sep='\t'):
     """Return key, val pair as single string appropriate for printing."""
-    return ' -> '.join([truncate(key, 20), truncate(val, 50)])
+    return (sep.join([trim(key, 20), trim(val, 50)]) if truncate else
+            sep.join([str(key), str(val)]))
 
 # Search Functions
 
@@ -81,7 +82,7 @@ def describe(data, quiet):
 
     return True
 
-def sample(data, n, quiet):
+def sample(data, n, quiet, truncate):
     """Sample first n (key, value) pairs of file."""
     if not quiet:
         print '\n> Print first {:,d} keys of file'.format(n)
@@ -89,11 +90,11 @@ def sample(data, n, quiet):
         print ''
 
     keys = sorted(data.keys())[:n]
-    pairs = [make_pair(key, data[key]) for key in keys]
+    pairs = [join_pair(key, data[key], truncate) for key in keys]
     print '\n'.join(pairs)
     return True
 
-def chars(data, n, quiet):
+def get_chars(data, n, quiet):
     """Print first n chars of file."""
     if not quiet:
         print '\n> Show first {:,d} chars of file'.format(n)
@@ -115,7 +116,7 @@ def find(data, key, quiet, truncate):
 
     if val is not None:
         if truncate:
-            print truncate(val, 80)
+            print trim(val, 80)
         else:
             print val
     else:
@@ -132,21 +133,31 @@ def find_rec(data, key, quiet, truncate):
     vals = find_key_rec(data, key)
     if vals is not []:
         if truncate:
-            found = ['Level {:,d}\t {}'.format(lvl, truncate(val, 60))
+            found = ['Level {:,d}\t {}'.format(lvl, trim(val, 60))
                      for lvl, val in vals]
         else:
-            found = ['Level {:,d}\t {}'.format(lvl, val) for lvl, val in vals]
+            found = ['Level {:,d}\t {}'.format(lvl, val)
+                     for lvl, val in vals]
         print '\n'.join(found)
     else:
         print 'Key not found.'
     return True
 
-def keys(data, quiet, truncate):
-    """"""
-    return
+def get_keys(data, recursive, quiet, truncate):
+    """List all top-level keys in data."""
+    if not quiet:
+        print '\n> List top-level keys in data.'
+    else:
+        print ''
 
-def keys_rec(data, quiet, truncate):
-    """"""
+    keys = find_all_keys(data) if recursive else sorted(data.keys())
+    if keys is not []:
+        if truncate:
+            print '\n'.join([trim(key, 80) for key in keys])
+        else:
+            print '\n'.join([str(key) for key in keys])
+    else:
+        print 'Empty file.'
     return
 
 def less(data_str):
@@ -169,15 +180,15 @@ def main(args):
     if args.sample:
         sample(data, args.sample, args.quiet, args.truncate)
     if args.chars:
-        chars(data, args.chars, args.quiet)
+        get_chars(data, args.chars, args.quiet)
     if args.find:
         find(data, args.find, args.quiet, args.truncate)
     if args.find_recursive:
         find_rec(data, args.find_recursive, args.quiet, args.truncate)
     if args.keys:
-        keys(data, args.quiet, args.truncate)
+        get_keys(data, False, args.quiet, args.truncate)
     if args.keys_recursive:
-        keys_rec(data, args.quiet, args.truncate)
+        get_keys(data, True, args.quiet, args.truncate)
         
     print '\n'
 
