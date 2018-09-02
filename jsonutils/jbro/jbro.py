@@ -11,8 +11,8 @@ def test_json(filename):
     try:
         with open(filename, 'r') as f:
             data = json.load(f)
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
         data = None
     return data
 
@@ -98,94 +98,94 @@ def get_all_keys(search_d):
 def describe(data, quiet):
     """Describe structure of data."""
     if not quiet:
-        print '\n> Describe structure of file'
+        print('\n> Describe structure of file')
     else:
-        print ''
+        print('')
 
-    print 'Top-level keys {:,d}'.format(len(data))
-    print 'Total keys     {:,d}'.format(count_keys(data))
-    print 'Max depth      {:,d}'.format(max_depth(data))
-    print 'Total chars    {:,d}'.format(len(json.dumps(data)))
+    print('Top-level keys {:,d}'.format(len(data)))
+    print('Total keys     {:,d}'.format(count_keys(data)))
+    print('Max depth      {:,d}'.format(max_depth(data)))
+    print('Total chars    {:,d}'.format(len(json.dumps(data))))
 
     return True
 
 def sample(data, n, quiet, truncate):
     """Sample first n (key, value) pairs of file."""
     if not quiet:
-        print '\n> Sample first {:,d} (key, value) pairs from file'.format(n)
+        print('\n> Sample first {:,d} (key, value) pairs from file'.format(n))
     else:
-        print ''
+        print('')
 
     keys = sorted(data.keys())[:n]
     pairs = [join_pair(key, data[key], truncate) for key in keys]
-    print '\n'.join(pairs)
+    print('\n'.join(pairs))
     return True
 
 def get_chars(data, n, quiet):
     """Print first n chars of file."""
     if not quiet:
-        print '\n> Show first {:,d} chars of file'.format(n)
+        print('\n> Show first {:,d} chars of file'.format(n))
     else:
-        print ''
+        print('')
 
     data_str = json.dumps(data, indent=2, sort_keys=True)
-    print data_str[:n]
+    print(data_str[:n])
     return True
 
 def find(data, key, quiet, truncate):
     """Attempt to find key in dict, where key nesting in form key1.key2..."""
     if not quiet:
-        print '\n> Find key {} in data'.format(key)
+        print('\n> Find key {} in data'.format(key))
     else:
-        print ''
+        print('')
 
     val = find_key(data, key)
 
     if val is not None:
         if truncate:
-            print trim(val, 80)
+            print(trim(val, 80))
         elif isinstance(val, dict):
-            print json.dumps(val, indent=2, sort_keys=True)
+            print(json.dumps(val, indent=2, sort_keys=True))
         else:
-            print val
+            print(val)
     else:
-        print 'Key not found.'
+        print('Key not found.')
     return True
 
 def find_rec(data, key, quiet, truncate):
     """Find key recursively in data, return all occurences."""
     if not quiet:
-        print '\n> Find key {} recursively in data'.format(key)
+        print('\n> Find key {} recursively in data'.format(key))
     else:
-        print ''
+        print('')
 
     vals = find_key_rec(data, key)
     if vals is not []:
         found = [join_pair('Level {:,d}'.format(lvl), val, truncate)
                  for lvl, val in vals]
-        print '\n'.join(found)
+        print('\n'.join(found))
     else:
-        print 'Key not found.'
+        print('Key not found.')
     return True
 
 def get_keys(data, recursive, quiet, truncate):
     """List all top-level keys in data."""
     if not quiet:
         if recursive:
-            print '\n> List all keys in data.'
+            print('\n> List all keys in data.')
         else:
-            print '\n> List top-level keys in data.'
+            print('\n> List top-level keys in data.')
     else:
-        print ''
+        print('')
 
     keys = get_all_keys(data) if recursive else sorted(data.keys())
     if keys is not []:
         if truncate:
-            print '\n'.join([trim(key, 80) for key in keys])
+            print('\n'.join([trim(key, 80) for key in keys]))
         else:
-            print '\n'.join([str(key) for key in keys])
+            print('\n'.join([str(key) for key in keys]))
     else:
-        print 'Empty file.'
+        print('Empty file.')
     return
 
 def less(data_str):
@@ -218,7 +218,7 @@ def main(args):
     if args.keys_recursive:
         get_keys(data, True, args.quiet, args.truncate)
 
-    print '\n'
+    print('\n')
 
     other_args = [args.describe, args.sample, args.chars, args.find,
                   args.find_recursive, args.keys, args.keys_recursive]
