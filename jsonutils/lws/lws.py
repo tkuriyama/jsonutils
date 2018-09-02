@@ -12,25 +12,20 @@ import sys
 import re
 import json
 import pickle
-import lws_logger
-
+from jsonutils.lws import lws_logger
 
 ERRORS = {'key': hash('error key'),
           'key_str': '*** Key error',
           'val': hash('error value'),
           'val_str': '*** Value error'}
 
-
 # Testing Helper
-
 
 def return_errors():
     """Return error dict for testing purposes."""
     return ERRORS
 
-
 # Type Validation
-
 
 def valid_text(val, rule):
     """Return True if regex fully matches non-empty string of value."""
@@ -42,13 +37,11 @@ def valid_text(val, rule):
             True if match is True else
             match[0] == val)
 
-
 def valid_num(val, rule):
     """Default True, check against rule if provided."""
     return (rule(val) if callable(rule) else
             val == rule if rule else
             True)
-
 
 def valid_list(val, rule):
     """Default True, check against rule if provided."""
@@ -56,26 +49,21 @@ def valid_list(val, rule):
             val == rule if rule else
             True)
 
-
 def valid_bool(val, rule):
     """Default True, check against rule if provided."""
     return val is rule if rule != '' else True
-
 
 def valid_null(val, rule):
     """Always True."""
     return True
 
-
 def is_text(val):
     """Return True if val is text, i.e. string or uniode."""
     return isinstance(val, str) or isinstance(val, unicode)
 
-
 def is_num(val):
     """Return True if val is number, i.e. int of float."""
     return isinstance(val, int) or isinstance(val, float)
-
 
 def classify(dtype):
     """Take data type and classify into string of JSON data type.
@@ -89,7 +77,6 @@ def classify(dtype):
             'null' if dtype is None else
             False)
 
-
 def classify_val(val):
     """Take value and classify into string of JSON data type."""
     return ('text' if is_text(val) else
@@ -100,9 +87,7 @@ def classify_val(val):
             'null' if val is None else
             False)
 
-
 # Validate Values
-
 
 def parse_schema_val(val):
     """Unpack tuple of the schema value."""
@@ -113,7 +98,6 @@ def parse_schema_val(val):
         rule = '.*' if classify(dtype) == 'text' else ''
     return dtype, rule
 
-
 def match_types(schema_type, data_val):
     """Return True if data types match between schema and data value.
     The difference between string and unicode is ignored.
@@ -121,7 +105,6 @@ def match_types(schema_type, data_val):
     if classify(schema_type) == 'text' and is_text(data_val):
         return True
     return isinstance(data_val, schema_type)
-
 
 def match_vals(schema_rule, data_val):
     """Call type-specific function to verify data value matches schema rule."""
@@ -133,7 +116,6 @@ def match_vals(schema_rule, data_val):
             valid_null(data_val, schema_rule) if dtype is 'null' else
             False)
 
-
 def valid_data_val(schema_val, data_val):
     """Verify data value validates against schema."""
     schema_type, schema_rule = parse_schema_val(schema_val)
@@ -141,9 +123,7 @@ def valid_data_val(schema_val, data_val):
     val_match = match_vals(schema_rule, data_val)
     return type_match and val_match
 
-
 # Validate Keys
-
 
 def parse_schema_key(key):
     """Unpack tuple of schema key."""
@@ -152,12 +132,10 @@ def parse_schema_key(key):
     repeat = '' if len(key) <= 3 else key[3]
     return dtype, rule, repeat
 
-
 def valid_data_key(data_key, dtype, rule):
     """Verify key is text (string or unicode) and matches regex."""
     return (valid_text(data_key, rule) if classify(dtype) == 'text' else
             False)
-
 
 def valid_length(repeat, keys):
     """Check for valid combo of repeat and length of keys."""
@@ -165,7 +143,6 @@ def valid_length(repeat, keys):
             True if repeat == '+' and len(keys) > 1 else
             True if repeat == '?' and len(keys) < 2 else
             False)
-
 
 def find_data_keys(data, schema_key):
     """Return all keys in data that match the schema key definition.
@@ -180,7 +157,6 @@ def find_data_keys(data, schema_key):
                   if valid_data_key(data_key, dtype, rule)]
 
     return found_keys if valid_length(repeat, found_keys) else []
-
 
 def find_schema_keys(schema, data_key):
     """Return all keys in schema that match the data key definition.
@@ -198,16 +174,13 @@ def find_schema_keys(schema, data_key):
 
     return found_keys
 
-
 # Validation Helpers
-
 
 def trim(item, max_len=75):
     """Return string representation of item, trimmed to max length."""
     string = str(item)
     string = string[:max_len] + '...' if len(string) > max_len else string
     return string
-
 
 def node_to_str(node):
     """Unpack node and convert to string."""
@@ -219,12 +192,10 @@ def node_to_str(node):
     key, val = trim(key), trim(val)
     return ': '.join([key, val])
 
-
 def walk(d, path):
     """Walk dict d using path as sequential list of keys, return last value."""
     if not path: return d
     return walk(d[path[0]], path[1:])
-
 
 def update_stack(fst_path, snd_path, fst, fst_key, snd_key):
     """Update validation stack.
@@ -247,15 +218,12 @@ def update_stack(fst_path, snd_path, fst, fst_key, snd_key):
     return [(new_fst_path, new_fst_key, new_snd_path)
             for new_fst_key in fst_keys]
 
-
 # Schema Validation
-
 
 def gen_schema_output(log):
     """Call logger.dict_to_str() to generate output."""
     root = ('root', 'root')
     return lws_logger.gen_log(log, root, node_to_str, ERRORS)
-
 
 def validate_schema(schema, data):
     """Schema-centric validation.
@@ -296,15 +264,12 @@ def validate_schema(schema, data):
 
     return log
 
-
 # Data Validation
-
 
 def gen_data_output(log):
     """Call logger.dict_to_str() to generate output."""
     root = ('root', 'root')
     return lws_logger.gen_log(log, root, node_to_str, ERRORS)
-
 
 def validate_data(schema, data):
     """Data-centric validation.
@@ -344,9 +309,7 @@ def validate_data(schema, data):
 
     return log
 
-
 # Main
-
 
 def join_logs(schema_log, data_log):
     """Join logs strings into single string."""
@@ -393,11 +356,10 @@ def main(schema_path, data_path):
     output = join_logs(schema_out, data_out)
     return s_key_err, s_val_err, d_key_err, d_val_err, output
 
-
 if __name__ == '__main__':
     if len(sys.argv) == 3:
         _, _, _, _, output = main(sys.argv[1], sys.argv[2])
-        print output
+        print(output)
     else:
-        print 'Call with two arguments, schema pickle and data filenames.\n'
-        print 'e.g. python json_lws_python.py schema.pkl data.json\n'
+        print('Call with two arguments, schema pickle and data filenames.\n')
+        print('e.g. python json_lws_python.py schema.pkl data.json\n')

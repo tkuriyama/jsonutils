@@ -2,7 +2,6 @@
 
 from collections import defaultdict
 
-
 def flatten_list(nested):
     """Accepts arbitrarily nested lists and returns generator for flat list."""
     for outer in nested:
@@ -11,7 +10,6 @@ def flatten_list(nested):
                 yield inner
         else:
             yield outer
-
 
 def filter_errors(seq, errors):
     """Helper for filter_keys.
@@ -29,7 +27,6 @@ def filter_errors(seq, errors):
     return ([key_err_str] if set(seq) == set([key_err]) else
             [val_err_str] if set(seq) == set([val_err]) else
             [s for s in seq if s not in (key_err, val_err)])
-
 
 def filter_keys(pairs, errors):
     """Take list of (key, value) tuples and filter out redundant values.
@@ -53,7 +50,6 @@ def filter_keys(pairs, errors):
 
     return ret_pairs
 
-
 def dict_to_tree(d, key, tree, errors={}, depth=0):
     """Transform dict into nested list of values representing tree form.
     Dict should be a graph in adjacency list form, i.e. mapping one node to a
@@ -76,7 +72,6 @@ def dict_to_tree(d, key, tree, errors={}, depth=0):
         return tree + [dict_to_tree(d, p, [(p, depth + 1)], errors, depth + 1)
                        for p in pairs]
 
-
 def parse_errors(nodes, errors):
     """Count errors in nodes.
     Args
@@ -92,7 +87,6 @@ def parse_errors(nodes, errors):
     output += '\nValue Errors:\t' + str(val_errors)
     return key_errors, val_errors, output
 
-
 def format_node(node, indent, depth, to_str=str):
     """Return string of graph node based on arguments.
     Args
@@ -106,7 +100,6 @@ def format_node(node, indent, depth, to_str=str):
     space = ' ' * ((len(indent) + 1) * (depth - 1))
     leader = '|' + indent if depth > 0 else ''
     return space + leader + to_str(node)
-
 
 def gen_log(graph, root, node_to_str, errors, indent=' -- '):
     """Generate string of log and capture errors from lws graph.
