@@ -191,7 +191,7 @@ def get_keys(data, recursive, quiet, truncate):
 def less(data_str):
     """Pretty print JSON and pipe to less."""
     p = Popen('less', stdin=PIPE)
-    p.stdin.write(data_str)
+    p.stdin.write(data_str.encode())
     p.stdin.close()
     p.wait()
     return True
@@ -224,6 +224,7 @@ def main(args):
                   args.find_recursive, args.keys, args.keys_recursive]
     if args.less or not any(other_args):
         data_str = json.dumps(data, indent=2, sort_keys=True)
+        print(data_str)
         less(data_str)
 
     return True
