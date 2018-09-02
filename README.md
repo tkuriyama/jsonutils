@@ -26,3 +26,10 @@ Clone locally and install (omit -e option if editable mode is not required)
 
     git clone https://github.com/tkuriyama/jsonutils
     pip install -e jsonutils
+
+<hr>
+
+** Version ** 
+
+Revised for Python 3.7, with backwards compatibility for Python 2.7 (though removing unicode-specific checks).
+
