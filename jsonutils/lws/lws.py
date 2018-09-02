@@ -59,7 +59,7 @@ def valid_null(val, rule):
 
 def is_text(val):
     """Return True if val is text, i.e. string or uniode."""
-    return isinstance(val, str) or isinstance(val, unicode)
+    return isinstance(val, str)
 
 def is_num(val):
     """Return True if val is number, i.e. int of float."""
@@ -69,7 +69,7 @@ def classify(dtype):
     """Take data type and classify into string of JSON data type.
     Boolean check should occur before int since bool is subclass of int.
     """
-    return ('text' if dtype in (str, unicode) else
+    return ('text' if dtype is str else
             'bool' if dtype is bool else
             'num' if dtype in (int, float) else
             'dict' if dtype is dict else
@@ -99,9 +99,7 @@ def parse_schema_val(val):
     return dtype, rule
 
 def match_types(schema_type, data_val):
-    """Return True if data types match between schema and data value.
-    The difference between string and unicode is ignored.
-    """
+    """Return True if data types match between schema and data value."""
     if classify(schema_type) == 'text' and is_text(data_val):
         return True
     return isinstance(data_val, schema_type)
@@ -133,7 +131,7 @@ def parse_schema_key(key):
     return dtype, rule, repeat
 
 def valid_data_key(data_key, dtype, rule):
-    """Verify key is text (string or unicode) and matches regex."""
+    """Verify key is text (str) and matches regex."""
     return (valid_text(data_key, rule) if classify(dtype) == 'text' else
             False)
 

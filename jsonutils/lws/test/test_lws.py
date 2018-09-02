@@ -16,16 +16,6 @@ class TestTypeValidation:
         assert f('abcde', lambda x: 'e' in x) is True
         assert f('abcde', lambda x: 'f' in x) is False
 
-    def test_valid_text_unicode(self):
-        """Regex/function matches non-empty text (unicode)."""
-        f = lws.valid_text
-        assert f(u'string', r'[a-z]*') is True
-        assert f(u'string', r'string') is True
-        assert f(u'string', r'[0-9]*') is False
-        assert f(u'', r'.*') is False
-        assert f(u'abcde', lambda x: 'e' in x) is True
-        assert f(u'abcde', lambda x: 'f' in x) is False
-
     def test_valid_list(self):
         """Basic test cases."""
         f = lws.valid_list
@@ -66,7 +56,7 @@ class TestTypeValidation:
         """Basic tests cases."""
         f = lws.classify
         assert f(str) == 'text'
-        assert f(unicode) == 'text'
+        # assert f(unicode) == 'text'
         assert f(int) == 'num'
         assert f(float) == 'num'
         assert f('test') is False
@@ -126,9 +116,8 @@ class TestValidateValues:
     def test_match_valid_data_val(self):
         """Test basic cases for schema validation against data values."""
         f = lws.valid_data_val
-        schema_val = ('some text', unicode, u'text')
+        schema_val = ('some text', str, 'text')
         assert f(schema_val, 'text') is True
-        assert f(schema_val, u'text') is True
         schema_val = ('some number', float, 7.00)
         assert f(schema_val, 7) is False
         assert f(schema_val, 7.00) is True
