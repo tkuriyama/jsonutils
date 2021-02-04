@@ -1,6 +1,13 @@
 
 [![Build Status](https://travis-ci.org/tkuriyama/jsonutils.svg?branch=master)](https://travis-ci.org/tkuriyama/jsonutils)
 
+# Deprecated
+
+Incorporated into [datautils](https://github.com/tkuriyama/datautils) repo.
+
+
+<hr>
+
 #### JSON Lightweight Schema (lws) ####
 
 lws offers a lightweight schema definition and validation library in Python. Schemas are defined as Python dictionaries and serialized to pickle files for use in validation.
